@@ -14,24 +14,6 @@
 #ifndef __AFXEXT_H__
 #include <afxext.h>
 #endif
-class map_value_finder
-{
-public:
-	map_value_finder(const DWORD &cmp_info):m_s_cmp_info(cmp_info){}
-	bool operator ()(const map<int,DWORD>::value_type &pair)
-	{
-		return pair.second == m_s_cmp_info;
-	}
-// 	map_value_finder(const std::string &cmp_info):m_s_cmp_string(cmp_info){}
-// 	bool operator ()(const map<int,std::string>::value_type &pair)
-// 	{
-// 		return pair.second == m_s_cmp_string;
-// 	}
-
-private:
-	const DWORD &m_s_cmp_info; 
-// 	const	std::string	&m_s_cmp_string;
-};
 
 
 class CScanView : public CFormView

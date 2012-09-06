@@ -182,6 +182,7 @@ BEGIN_MESSAGE_MAP(CRadioSetView, CFormView)
 	//}}AFX_MSG_MAP
 	ON_CONTROL_RANGE(CBN_SELCHANGE,IDC_COMBO_TOT_1,IDC_COMBO_TOT_4,OnTotSelChange)
 	ON_CONTROL_RANGE(CBN_SELCHANGE,IDC_COMBO_EMER_1,IDC_COMBO_EMER_4,OnEmerSelChange)
+	ON_CBN_SELCHANGE(IDC_COMBO_ALARM_CHANNEL, &CRadioSetView::OnCbnSelchangeComboAlarmChannel)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -203,6 +204,7 @@ void CRadioSetView::Dump(CDumpContext& dc) const
 // CRadioSetView message handlers
 void	CRadioSetView::LoadData()
 {
+	LoadComboString();
 	CString str  = GetIDStr(1,SETTING_MSID);//((CPCSWDoc*)GetDocument())->GetMSID(SETTING_MSID);
 	m_editID.SetWindowText(str);
 	str.Empty();
@@ -234,10 +236,29 @@ void	CRadioSetView::LoadData()
 			nRet--;
  		((CComboBox*)GetDlgItem(CheckIDArray.nCtrlID[i]))->SetCurSel(nRet);
 	}
-	for (i=26;i<29;i++)
+	for (i=26;i<28;i++)
 	{
 		nRet = GetEmerSettingValues(CheckIDArray.nOffset[i]);
 		((CComboBox*)GetDlgItem(CheckIDArray.nCtrlID[i]))->SetCurSel(nRet);
+	}
+	if (i == 28)//报警跳转信道
+	{
+		int nCh = GetEmerSettingValues(CheckIDArray.nOffset[i]);
+		int	nZone = GetEmerSettingValues(CheckIDArray.nOffset[i]+1);
+		if (nCh == 0xff)//当前信道
+		{
+			((CComboBox*)GetDlgItem(CheckIDArray.nCtrlID[i]))->SetCurSel(0);
+		}
+		else if(nCh <=16 && nZone <=16)
+		{
+			DWORD nInfo = (WORD)nCh&0x00ff |((WORD)(nZone<<8)&0xff00);
+			it = find_if(mapChannel.begin(),mapChannel.end(),map_value_finder(nInfo));
+			if (it!=mapChannel.end())
+			{
+				int nSel = (int)it->first;
+				((CComboBox*)GetDlgItem(CheckIDArray.nCtrlID[i]))->SetCurSel(nSel);
+			}
+		}
 	}
 	for (i=0;i<SPINEDIT_SUM_SETTING;i++)
 	{
@@ -407,7 +428,6 @@ void CRadioSetView::OnInitialUpdate()
 	m_cbVoxLvl.AddString("关闭");
 	int i=0;
 
-	LoadComboString();
  	m_editID.SetLimitText(8);
 	LoadData();
 }
@@ -504,8 +524,32 @@ void	CRadioSetView::LoadComboString()
 		if(i<=9)
 			m_cbNoiseLvl.AddString(strLevel[i]);
 	}
+	LoadAlarmCh();
 }
 
+void	CRadioSetView::LoadAlarmCh()
+{
+	CString		strCh,strZone;
+	m_cbAlarmCh.ResetContent();
+	m_cbAlarmCh.AddString("当前信道");
+	int i=0,j=0;
+	int nCh,nZone;
+	for (i=0;i<16;i++)
+	{
+		for(j=0;j<16;j++)
+		{
+			strZone = ((CPCSWApp*)AfxGetApp())->GetName(i+1,j+1,ZONE_NAME,ZONE_CHANNEL_NAME_BYTE,18,0,false);
+			strCh = ((CPCSWApp*)AfxGetApp())->GetName(i+1,j+1,CHANNEL_CHANNAME,ZONE_CHANNEL_NAME_BYTE);
+			if(!(strCh.IsEmpty() ||strZone.IsEmpty()))
+			{
+				m_cbAlarmCh.AddString(strZone+":"+strCh);
+				nCh = DWORD(j)&0x00ff;
+				nZone = (DWORD(i)<<8)&0xff00;
+				mapChannel.insert(pair<int,DWORD>(i*16+j,nZone|nCh));
+			}
+		}
+	}
+}
 void CRadioSetView::OnDeltaposSpinPreTxDelay(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	NM_UPDOWN* pNMUpDown = (NM_UPDOWN*)pNMHDR;
@@ -905,4 +949,25 @@ void	CRadioSetView::OnCheckPowerLvl()
 	else
 		m_cbPowerSaveLvl.EnableWindow(FALSE);
 	SetSettingValues(SETTING_POWERSAVE_EN,nCheck);
+}
+void CRadioSetView::OnCbnSelchangeComboAlarmChannel()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int	nSel = m_cbAlarmCh.GetCurSel();
+	DWORD	dwInfo ;
+	if(nSel > 0)
+	{
+		it = mapChannel.find(nSel-1);
+		dwInfo = (DWORD)it->second;
+		int nCh,nZone;
+		nCh = dwInfo&0x00ff;
+		nZone = dwInfo>>8;
+		SetEmerSettingValues(SETTING_ALARM_CHANNEL,nCh+1);
+		SetEmerSettingValues(SETTING_ALARM_CHANNEL+1,nZone);
+	}
+	else if (nSel == 0)
+	{
+		SetEmerSettingValues(SETTING_ALARM_CHANNEL,0x00);
+		SetEmerSettingValues(SETTING_ALARM_CHANNEL+1,0xff);
+	}
 }

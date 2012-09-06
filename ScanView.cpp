@@ -246,27 +246,7 @@ CString	CScanView::GetChannelName(int ByteLen,int nFlag,int nZone,//所要获取的区
 	delete	szTemp;
 	return str;
 }
-CString	CScanView::GetName(int nZone,int nCh,int nFlag,int nLen,int nStep1 /* = 736 */,int nStep2 /* = 46 */,bool bCh /* = true */)
-{
-	BYTE *ptr,*pInfo;
-	BYTE* szTemp = new BYTE[nLen*2];
-	if(bCh)
-	{
-		pInfo = ((CPCSWApp*)AfxGetApp())->m_CommInfo.pChannelInfo;
-		ptr = pInfo+nFlag+(nZone-1)*nStep1+(nCh-1)*nStep2;
-	}
-	else
-	{
-		pInfo = ((CPCSWApp*)AfxGetApp())->m_CommInfo.pZoneInfo;
-		ptr = pInfo+nFlag+(nZone-1)*nStep1+(nCh-1)*nStep2;
-	}
-	memcpy(szTemp,ptr,nLen);
-	szTemp[nLen] = szTemp[nLen+1] = 0x00;
-	CString str;
-	WideCharToMultiByte(CP_ACP,0,(LPCWSTR)szTemp,-1,str.GetBuffer(nLen),nLen,NULL,NULL);
-	str.ReleaseBuffer();
- 	return str;
-}
+
 int	CScanView::GetScanlistChInfo(int nFlag,int nLen,int nListnum,int nChnum,bool bChOrZone /* = true */)
 {
 	BYTE*	ptr = ((CPCSWApp*)AfxGetApp())->m_CommInfo.pScanInfo;
@@ -367,9 +347,9 @@ void	CScanView::ScanlistAllShow(void)
 		for (j=0;j<16;j++)
 		{
 			//获取当前区域别名
-			strZone = GetName(i+1,j+1,ZONE_NAME,ZONE_CHANNEL_NAME_BYTE,18,0,false);
+			strZone = ((CPCSWApp*)AfxGetApp())->GetName(i+1,j+1,ZONE_NAME,ZONE_CHANNEL_NAME_BYTE,18,0,false);
 				//((CPCSWDoc*)GetDocument())->GetChannelName(CZoneInfo::ZONE_CHANNEL_NAME_BYTE,CZoneInfo::ZONE_NAME,i,j,18,0,false);
-			strCh = GetName(i+1,j+1,CHANNEL_CHANNAME,ZONE_CHANNEL_NAME_BYTE);
+			strCh = ((CPCSWApp*)AfxGetApp())->GetName(i+1,j+1,CHANNEL_CHANNAME,ZONE_CHANNEL_NAME_BYTE);
 				//((CPCSWDoc*)GetDocument())->GetChannelName(CZoneInfo::ZONE_CHANNEL_NAME_BYTE,CZoneInfo::CHANNEL_CHANNAME,i,j);
 			if(!(strCh.IsEmpty() ||strZone.IsEmpty()))
 			{
@@ -411,10 +391,10 @@ void	CScanView::ScanlistAllShow(void)
 				//((CPCSWDoc*)GetDocument())->GetScanlistInfo(SCAN_CHANNELFLAG,1,m_CurrentList,i+1,false);
 			if (nCh!=0xff && nZone!=0xff)
 			{
-				strCh = GetName(nZone,nCh,CHANNEL_CHANNAME,ZONE_CHANNEL_NAME_BYTE);
+				strCh = ((CPCSWApp*)AfxGetApp())->GetName(nZone,nCh,CHANNEL_CHANNAME,ZONE_CHANNEL_NAME_BYTE);
 					//GetChannelName(ZONE_CHANNEL_NAME_BYTE,CHANNEL_CHANNAME,nZone,nCh);
 					//((CPCSWDoc*)GetDocument())->GetChannelName(CZoneInfo::ZONE_CHANNEL_NAME_BYTE,CZoneInfo::CHANNEL_CHANNAME,nZone,nCh);
- 				strZone = GetName(nZone,nCh,ZONE_NAME,ZONE_CHANNEL_NAME_BYTE,18,0,false);
+ 				strZone = ((CPCSWApp*)AfxGetApp())->GetName(nZone,nCh,ZONE_NAME,ZONE_CHANNEL_NAME_BYTE,18,0,false);
 					//GetChannelName(ZONE_CHANNEL_NAME_BYTE,ZONE_NAME,nZone,nCh,18,0,false);
 					//((CPCSWDoc*)GetDocument())->GetChannelName(CZoneInfo::ZONE_CHANNEL_NAME_BYTE,CZoneInfo::ZONE_NAME,nZone,nCh,18,0,false);
  				m_ListUsedCh.AddString(strZone+":"+strCh);

@@ -41,6 +41,8 @@ public:
 	void	LoadMenuItem();
 	void	LoadKeyFunc();
 	void	SetKeyFunc(int nFlag,int nVal);
+	void	SetMenuVal(int nFlag,int nVal);
+	void	SetMenuKillUnkill(int nVal,bool	bKill = true);
 	int		GetCheckValues(int nFlag);
 	int		GetKillUnkill(int nFlag);
 	int		GetKeyFuncValues(int nFlag);

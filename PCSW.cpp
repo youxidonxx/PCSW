@@ -321,7 +321,7 @@ void	CPCSWApp::OnFileSave()
 {
 	LPCTSTR szFilter = _T("DAT文件(*.dat)|*.dat|所有文件(*.*)|*.*||");
 	CFileDialog	fileDlg(FALSE,_T(".dat"),_T("*.dat"),
-		 OFN_HIDEREADONLY|OFN_EXTENSIONDIFFERENT,szFilter,NULL);
+		 OFN_HIDEREADONLY|OFN_EXTENSIONDIFFERENT| OFN_OVERWRITEPROMPT,szFilter,NULL);
 	CString	newName;
 	if( fileDlg.DoModal() == IDOK )
 	{
@@ -407,10 +407,33 @@ int  CPCSWApp::GetFreqBoundry(bool bMax /* = true */)
 	}
 	return nBoundry;
 }
+
 /************************************************************************/
 /* scan 扫描
 */
 /************************************************************************/
+CString		CPCSWApp::GetName(int nZone,int nCh,int nFlag,int nLen,
+							  int nStep1 /* = 736 */,int nStep2 /* = 46 */,bool bCh /* = true */)
+{
+	BYTE *ptr,*pInfo;
+	BYTE* szTemp = new BYTE[nLen*2];
+	if(bCh)
+	{
+		pInfo = m_CommInfo.pChannelInfo;
+		ptr = pInfo+nFlag+(nZone-1)*nStep1+(nCh-1)*nStep2;
+	}
+	else
+	{
+		pInfo = m_CommInfo.pZoneInfo;
+		ptr = pInfo+nFlag+(nZone-1)*nStep1+(nCh-1)*nStep2;
+	}
+	memcpy(szTemp,ptr,nLen);
+	szTemp[nLen] = szTemp[nLen+1] = 0x00;
+	CString str;
+	WideCharToMultiByte(CP_ACP,0,(LPCWSTR)szTemp,-1,str.GetBuffer(nLen),nLen,NULL,NULL);
+	str.ReleaseBuffer();
+	return str;
+}
 int		CPCSWApp::GetScanlistCount()
 {
 	int nRet = *(WORD*)m_CommInfo.pScanInfo;

@@ -63,7 +63,7 @@ BEGIN_MESSAGE_MAP(CMenuKeyView, CFormView)
 	//}}AFX_MSG_MAP
 // 	ON_NOTIFY(GVN_BEGINLABELEDIT, IDC_CUSTOM2, OnEditGrid)
 // 	ON_MESSAGE(WM_ON_CHKBOX,OnCheckBox)
-	ON_NOTIFY(LVN_COLUMNCLICK,IDC_LIST_MENU,OnCheckBox)
+	ON_NOTIFY(NM_CLICK,IDC_LIST_MENU,OnCheckBox)
 	ON_CONTROL_RANGE(CBN_SELCHANGE,IDC_COMBO_KEYFUNC_1,IDC_COMBO_KEYFUNC_11,OnSelchangeComboKeyfunc)
 END_MESSAGE_MAP()
 
@@ -115,7 +115,7 @@ void CMenuKeyView::OnInitialUpdate()
 
 
 }
-void	CMenuKeyView::PreTranslateMessage(MSG* pMsg)
+BOOL	CMenuKeyView::PreTranslateMessage(MSG* pMsg)
 {
 	return CFormView::PreTranslateMessage(pMsg);
 }
@@ -184,6 +184,15 @@ int		CMenuKeyView::GetKillUnkill(int nFlag)
 	int	nRet  = theApp.m_CommInfo.pRadioSetting[0x00+nFlag];
 	return nRet;
 }
+void	CMenuKeyView::SetMenuKillUnkill(int nVal,bool bKill /*= TRUE*/)
+{
+	if(bKill)
+	{
+		((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioSetting[0x00+MenuAllowKill] = nVal;
+	}
+	else
+		((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioSetting[0x00+MenuAllowActive] = nVal;
+}
 int		CMenuKeyView::GetKeyFuncValues(int nFlag)
 {
 	int	nRet  = theApp.m_CommInfo.pKeyFunctionSetting[0x00+nFlag];
@@ -200,6 +209,10 @@ void	CMenuKeyView::SetStaticName()
 void	CMenuKeyView::SetKeyFunc(int nFlag,int nVal)
 {
 	((CPCSWApp*)AfxGetApp())->m_CommInfo.pKeyFunctionSetting[0x00+nFlag] = nVal;
+}
+void	CMenuKeyView::SetMenuVal(int nFlag,int nVal)
+{
+	((CPCSWApp*)AfxGetApp())->m_CommInfo.pMenuSetting[0x00+nFlag] = nVal;
 }
 void	CMenuKeyView::OnSelchangeComboKeyfunc(UINT	nID) 
 {
@@ -218,7 +231,46 @@ void	CMenuKeyView::OnSelchangeComboKeyfunc(UINT	nID)
 }
 void	CMenuKeyView::OnCheckBox(NMHDR * pNMHDR, LRESULT* pResult)
 {
-	int nItem = (int*)pNMHDR;
-	UINT	nMouseEvent = (UINT*)pResult;
+// 	CPoint	pt;
+// 	GetCursorPos(&pt);
+// 	m_listMenu.ScreenToClient(&pt);
+// 	int	item;
+// 	UINT	nFlag;
+// 	item = m_listMenu.GetNextItem(-1,LVNI_ALL|LVNI_SELECTED);
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	const int COL = pNMListView->iSubItem;
+	int		nRow = pNMListView->iItem;
+	int		nCnt = m_listMenu.GetItemCount();
+	int nState;
+	if (COL==0 )
+	{
+// 		pNMListView->isubitem	
+		if(nRow>0 && nRow<nCnt-2)
+		{
+			nState = m_listMenu.GetCheck(nRow);
+			nState = !nState;
+			SetMenuVal(nRow-1,nState);
+			
+		}
+		else if (nRow == nCnt-2)//¼¤»î
+		{
+			nState = m_listMenu.GetCheck(nRow);
+			nState = !nState;
+			SetMenuKillUnkill(nState,FALSE);
+		}
+		else if (nRow == nCnt-1)//Ò£±Ð
+		{
+			nState = m_listMenu.GetCheck(nRow);
+			nState = !nState;
+			SetMenuKillUnkill(nState);
+		}
+	}
+		// m_listMenu.HitTest(pt,&nFlag);
+ // 	int nItem = *(int*)pNMHDR;
+// 	UINT	nMouseEvent = *(UINT*)pResult;
+// 	if (item>0 && item<m_listMenu.GetItemCount())
+// 	{
+// 		int nState = m_listMenu.GetCheck(item);
+// 	}
 
 }

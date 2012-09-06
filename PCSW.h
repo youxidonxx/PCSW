@@ -84,6 +84,17 @@ typedef 	struct	tagCommInfo
 
 	unsigned	char	pShortText[0x2000];//快捷文本内容
 }CommInfo,*pCommInfo;
+class map_value_finder
+{
+public:
+	map_value_finder(const DWORD &cmp_info):m_s_cmp_info(cmp_info){}
+	bool operator ()(const map<int,DWORD>::value_type &pair)
+	{
+		return pair.second == m_s_cmp_info;
+	}
+private:
+	const DWORD &m_s_cmp_info; 
+};
 
 class CPCSWApp : public CWinApp
 {
@@ -121,6 +132,8 @@ public:
 	int			GetSmsInfo(int nGrp,int nFlag);
 	//SCANLIST 扫描列表
 	CString		GetScanlistName(int nFlag,int nLen,int nList);
+	CString		GetName(int nZone,int nCh,int nFlag,int nLen,
+		int nStep1  = 736 ,int nStep2  = 46 ,bool bCh  = true );
 	int			GetScanlistCount();
 	//ZONE/CHANNEL	区域信息/信道信息
 	void		SetFreq(int nZone,int nCh,int nFlag,CString&	str,bool bRx = true);

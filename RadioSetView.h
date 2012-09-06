@@ -29,6 +29,9 @@ typedef	struct	_tagSpinCtrlInfo
 	int	nOverleap[SPINEDIT_SUM_SETTING];
 	int nStep[SPINEDIT_SUM_SETTING];
 }tagSpinCtrlInfo;
+
+class	map_value_finder;
+
  class CRadioSetView : public CFormView
 {
 public:
@@ -38,6 +41,7 @@ public:
 
 	void	EnableComboBoxes();
 	void	LoadComboString();
+	void	LoadAlarmCh();
 	int		GetSettingValue(int nFlag);
 	int		GetEmerSettingValues(int nFlag);
 	void	SetSettingValues(int nFlag,int nVal);
@@ -47,68 +51,8 @@ public:
 
 // Form Data
 public:
-	enum	SettingAddress
-	{
-		SETTING_POWERSAVE_EN = 0x00,
-		SETTING_POWERSAVE_SCALE = 0x01,
-		SETTING_TCOMM_TIME	= 0x02,
-		SETTING_TPRETOT_TIME = 0X03,
-		SETTING_TREKEY_TIME	 = 0X04,
-		SETTING_TRESET_TIME = 0X05,
-		SETTING_WHISPER_EN = 0X06,
-		SETTING_NOISE_SCALE = 0X07,
-		SETTING_VOX_LEVEL = 0X08,
-		SETTING_VOX_DELAY_TIME = 0X09,
-		SETTING_VOX_CANCEL = 0X0A,
-		SETTING_VOX_FORBID = 0X0B,
-		SETTING_KEYLOCK = 0X0C,
-		SETTING_CHANNELLOCK = 0X0D,
-		SETTING_VIBRATE_EN = 0X0E,
-		SETTING_TONE_EN = 0X0F,
-		SETTING_CALLOUT_TONE = 0X10,
-		SETTING_CALLIN_TONE = 0X11,
-		SETTING_SMS_TONE = 0X12,
-		SETTING_LOWBATTORY_TONE = 0X13,
-		SETTING_KEY_TONE	= 0X14,
-		SETTING_LIGHT_NOTE = 0X15,
-		SETTING_BACKLIGHT_NOTE = 0X16,
-		SETTING_BACKLIGHT_DELAYTIME = 0X17,
-		SETTING_IDLE_DISPLAY	= 0X18,
-		SETTING_DATE_EN = 0X19,
-		SETTING_MSID = 0X1A,		//4字节
-		SETTING_WILDCARD_EN = 0X1E,
-		SETTING_MANUALDIAL_EN = 0X1F,
-		SETTING_PRETXDELAY_TIME = 0X20,
-		SETTING_GRPHOLD_TIME = 0X21,
-		SETTING_PEERHOLD_TIME = 0X22,
-		SETTING_KILL_EN = 0X23,
-		SETTING_ACTIVE_EN = 0X24,
-		SETTING_DECODE_EN = 0X25,
-		SETTING_CALLALL_EN = 0X26,
-		SETTING_CALLGRP_EN = 0X27,
-		SETTING_CREATE_CONTENT_EN = 0X28,
-		SETTING_EDIT_SMS_EN = 0X29,
-	};
-	enum	EmeAddress
-	{	
-		SETTING_ALARM_NAME = 0X00,//16字节
-		SETTING_ALARM_TYPE = 0X10,
-		SETTING_ALARM_MODE = 0X11,
-		SETTING_ALARM_CHANNEL = 0X12,//2字节
-		SETTING_ALARM_TIME = 0X14,
-		SETTING_ALARM_CALL_TIME = 0X15,
-		SETTING_ALARM_MICHOLD_TIME = 0X16,
-		SETTING_ALARM_RCVHOLD_TIME = 0X17,
-		SETTING_ALARM_EMEID = 0X18	//8字节
-	};
-	enum	SettingLen
-	{
-		SETTING_BYTE_LEN = 1,
-		SETTING_WORD_LEN = 2,
-		SETTING_DWORD_LEN = 4,
-		SETTING_DBDWORD_LEN = 8,
-		SETTING_DBDBDWORD_LEN = 16
-	};
+	map<int,DWORD>	mapChannel;
+	map<int,DWORD>::iterator	it;
 public:
 	//{{AFX_DATA(CRadioSetView)
 	enum { IDD = IDD_SETTING_FORM };
@@ -202,6 +146,8 @@ protected:
 	afx_msg void OnCheckPowerLvl();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnCbnSelchangeComboAlarmChannel();
 };
 
 /////////////////////////////////////////////////////////////////////////////
