@@ -1,0 +1,99 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: PCSW - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"Debug/PCSW.res" /d "_DEBUG" /d "_AFXDLL" "C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\PCSW.rc"" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP3B4.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Debug/PCSW.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\AddBox.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\ChildFrm.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\COMSET.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\CSerial.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\DpmrView.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\GridCtrl.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\GridEdit.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\GridView.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\MainFrm.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\MenuKeyView.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\MenuSet.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\mybar.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\MyPropSheet.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\MyTree1.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\PCSW.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\PCSWDoc.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\PCSWView.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\PropPageContact.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\PropPageGrp.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\PropPageSMS.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\RadioSetView.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\ReportCtrl.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\ScanView.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\SIZECBAR.CPP"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\SpanEdit.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\SplitterWnd.cpp"
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\ZoneInfo.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP3B4.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP3B5.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Debug/PCSW.pch" /Yc"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"C:\Documents and Settings\Administrator\桌面\PCSW\PCSW\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP3B5.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP3B6.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:yes /pdb:"Debug/PCSW.pdb" /debug /machine:I386 /out:"Debug/PCSW.exe" /pdbtype:sept 
+".\Debug\AddBox.obj"
+".\Debug\ChildFrm.obj"
+".\Debug\COMSET.obj"
+".\Debug\CSerial.obj"
+".\Debug\DpmrView.obj"
+".\Debug\GridCtrl.obj"
+".\Debug\GridEdit.obj"
+".\Debug\GridView.obj"
+".\Debug\MainFrm.obj"
+".\Debug\MenuKeyView.obj"
+".\Debug\MenuSet.obj"
+".\Debug\mybar.obj"
+".\Debug\MyPropSheet.obj"
+".\Debug\MyTree1.obj"
+".\Debug\PCSW.obj"
+".\Debug\PCSWDoc.obj"
+".\Debug\PCSWView.obj"
+".\Debug\PropPageContact.obj"
+".\Debug\PropPageGrp.obj"
+".\Debug\PropPageSMS.obj"
+".\Debug\RadioSetView.obj"
+".\Debug\ReportCtrl.obj"
+".\Debug\ScanView.obj"
+".\Debug\SIZECBAR.OBJ"
+".\Debug\SpanEdit.obj"
+".\Debug\SplitterWnd.obj"
+".\Debug\StdAfx.obj"
+".\Debug\ZoneInfo.obj"
+".\Debug\PCSW.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP3B6.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+c:\program files\microsoft sdks\windows\v7.1\include\winnt.h(3994) : warning C4035: 'ReadPMC' : no return value
+c:\program files\microsoft sdks\windows\v7.1\include\winnt.h(4023) : warning C4035: 'ReadTimeStampCounter' : no return value
+c:\program files\microsoft sdks\windows\v7.1\include\wingdi.h(4685) : warning C4068: unknown pragma
+c:\program files\microsoft sdks\windows\v7.1\include\wingdi.h(4686) : warning C4068: unknown pragma
+c:\documents and settings\administrator\桌面\pcsw\pcsw\stdafx.h(29) : error C2871: 'std' : does not exist or is not a namespace
+执行 cl.exe 时出错.
+
+
+
+<h3>Results</h3>
+PCSW.exe - 1 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

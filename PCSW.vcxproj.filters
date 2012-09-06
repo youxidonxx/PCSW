@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{e28797ed-3954-4d15-8fb5-27162c4ddab5}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{81d77870-4d25-4b56-b292-0b7b74ad4deb}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AddBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="COMSET.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CSerial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DpmrView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridEdit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuKeyView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mybar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyPropSheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTree1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PCSW.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PCSWDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PCSWView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropPageContact.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropPageGrp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropPageSMS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RadioSetView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScanView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SIZECBAR.CPP">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpanEdit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SplitterWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZoneInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AddBox.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CELLRANGE.H">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildFrm.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="COMSET.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CSerial.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DpmrView.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GridEdit.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuSet.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mybar.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyPropSheet.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyTree1.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PCSW.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PCSWDoc.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PCSWView.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropPageContact.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropPageGrp.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropPageSMS.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RadioSetView.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportCtrl.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScanView.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SIZECBAR.H">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpanEdit.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitterWnd.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="spmsgid.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="spstruct.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sysmsgdef.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="typedef.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ZoneInfo.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GridView.h" />
+    <ClInclude Include="MenuKeyView.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PCSW.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\binaryda.bin">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\cds.bin">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\cursor1.cur">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\PCSW.ico">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\PCSW.rc2">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\PCSWDoc.ico">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\Toolbar.bmp">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ReadMe.txt" />
+  </ItemGroup>
+</Project>
