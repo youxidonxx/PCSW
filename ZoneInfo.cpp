@@ -153,6 +153,7 @@ void CZoneInfo::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
 	
+	ModifyStyle(0,WS_CLIPCHILDREN|WS_CLIPSIBLINGS);
 	// TODO: Add your specialized code here and/or call the base class
 	//获取到每个区域的有效信道数
 	m_nZonenum = 0;
@@ -285,7 +286,7 @@ CString	CZoneInfo::GetVoiceEncryptCode(int nFlag,int nZone,int nChannel)
 /************************************************************************/
 void	CZoneInfo::LoadData()
 {
-	m_GridCtrl.DeleteAllItems();
+// 	m_GridCtrl.DeleteAllItems();
 	m_nZonenum = 0;
 	for (int i=1;i<=16;i++)
 	{
@@ -325,7 +326,7 @@ void	CZoneInfo::LoadData()
 
 		m_GridCtrl.SetGridResize(FALSE,TRUE);	//宽和高度是否可更改
 		m_GridCtrl.EnableSelection(FALSE);
-
+//		m_GridCtrl.SetRedraw(FALSE,TRUE);
 		int nColumnWidth[] = {COLUMN_NARROW,COLUMN_NORMAL,COLUMN_NORMAL,COLUMN_NORMAL,COLUMN_NORMAL,
 							COLUMN_NORMAL,COLUMN_NORMAL,COLUMN_NORMAL,COLUMN_NORMAL,COLUMN_NARROW,
 							COLUMN_NORMAL,COLUMN_NORMAL,COLUMN_NORMAL,COLUMN_NORMAL,COLUMN_NORMAL,
@@ -336,11 +337,10 @@ void	CZoneInfo::LoadData()
 		for(item.row = 0;item.row < nChnum;item.row++)
 			m_GridCtrl.SetRowHeight(item.row,20);
 
-
 	}//end if ！= nchnum
 	if (nChnum > 0)
 	{
-//		m_GridCtrl.SetRedraw(FALSE);
+		m_GridCtrl.SetRedraw(FALSE);
 		//加载行列标题内容
 		item.mask	= GVIF_TEXT	| GVIF_FORMAT;
 		item.nFormat= DT_CENTER | DT_VCENTER | DT_SINGLELINE;
@@ -368,7 +368,8 @@ void	CZoneInfo::LoadData()
 			EnableDigitOrAnalog(item.row);
 		}
 		SetZonename();
-		m_GridCtrl.SetRedraw(TRUE,TRUE);//令滚动条出现
+ 		m_GridCtrl.SetRedraw(TRUE,TRUE);//令滚动条出现
+//		m_GridCtrl.SetRedraw(TRUE);//令滚动条出现
 
 	}
 	EnableButtons();
@@ -1488,7 +1489,7 @@ BOOL CZoneInfo::OnEraseBkgnd(CDC* pDC)
 // 	ADD_NOERASE_RGN(IDC_BUTTON1);
 // 	ADD_NOERASE_RGN(IDC_LIST_STAT);
 // 	ERASE_BKGND_END(pDC, GetSysColor(COLOR_3DFACE));
-// 	return false;
+// 	return TRUE;
 	return CFormView::OnEraseBkgnd(pDC);
 }
 

@@ -385,6 +385,9 @@ int  CPCSWApp::GetFreqBoundry(bool bMax /* = true */)
 		case 4:
 			nBoundry = 425;
 			break;
+		default:
+			nBoundry = 400;
+		break;		
 		}
 	}
 	else
@@ -403,6 +406,9 @@ int  CPCSWApp::GetFreqBoundry(bool bMax /* = true */)
 		case 3:
 			nBoundry = 400;
 			break;
+		default:
+			nBoundry = 400;
+			break;		
 		}
 	}
 	return nBoundry;

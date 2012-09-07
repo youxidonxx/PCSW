@@ -88,9 +88,6 @@ BEGIN
     SEPARATOR
     BUTTON      ID_WRITE_PARAMETER
     BUTTON      ID_READ_PARAMETER
-    BUTTON      ID_COPY_PARAMETER
-    SEPARATOR
-    BUTTON      ID_RESET
     SEPARATOR
     BUTTON      ID_APP_ABOUT
 END
@@ -133,7 +130,7 @@ BEGIN
         MENUITEM "保存(&S)\tCtrl+S",              ID_FILE_SAVE
         MENUITEM "另存为(&A)...",                  ID_FILE_SAVE_AS
         MENUITEM SEPARATOR
-        MENUITEM "最近文件",                        ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM "最近文件",                        ID_FILE_MRU_FILE1
         MENUITEM SEPARATOR
         MENUITEM "退出(&X)",                      ID_APP_EXIT
     END
@@ -158,19 +155,10 @@ BEGIN
     BEGIN
         MENUITEM "读频",                          ID_READ_PARAMETER
         MENUITEM "写频",                          ID_WRITE_PARAMETER
-        MENUITEM "克隆",                          ID_COPY_PARAMETER
-        MENUITEM "生效",                          ID_RESET
     END
     POPUP "帮助(&H)"
     BEGIN
         MENUITEM "关于 PCSW(&A)...",              ID_APP_ABOUT
-    END
-    POPUP "窗口(&W)", INACTIVE
-    BEGIN
-        MENUITEM "新建窗口(&N)",                    ID_WINDOW_NEW
-        MENUITEM "层叠(&C)",                      ID_WINDOW_CASCADE
-        MENUITEM "平铺(&T)",                      ID_WINDOW_TILE_HORZ
-        MENUITEM "排列图标(&A)",                    ID_WINDOW_ARRANGE
     END
 END
 
@@ -409,7 +397,7 @@ BEGIN
     PUSHBUTTON      "",IDC_BUTTON_INSERT,527,290,35,15,NOT WS_VISIBLE | WS_DISABLED
     PUSHBUTTON      "删除",IDC_BUTTON_DELETE,399,10,35,15
     COMBOBOX        IDC_COMBO_ZONELIST,300,225,75,115,CBS_DROPDOWN | NOT WS_VISIBLE | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "",IDC_GRID_ZONE,"MFCGridCtrl",WS_BORDER | WS_TABSTOP,7,41,690,231
+    CONTROL         "",IDC_GRID_ZONE,"MFCGridCtrl",WS_BORDER | WS_TABSTOP,7,41,690,257
     EDITTEXT        IDC_EDIT_ZONENAME,80,14,50,10,ES_AUTOHSCROLL
     LTEXT           "区域别名：",IDC_STATIC,35,14,38,8
 END

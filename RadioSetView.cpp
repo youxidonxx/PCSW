@@ -63,7 +63,7 @@ CRadioSetView::CRadioSetView()
 	CheckIDArray.nCtrlID[10] = IDC_CHECK_DATE_SHOW;              CheckIDArray.nOffset[10] =  SETTING_DATE_EN   ; 
 	CheckIDArray.nCtrlID[11] = IDC_CHECK_WILDCARD;               CheckIDArray.nOffset[11] =   SETTING_WILDCARD_EN  ; 
 	CheckIDArray.nCtrlID[12] = IDC_CHECK_MANUAL_DIAL;            CheckIDArray.nOffset[12] =   SETTING_MANUALDIAL_EN  ; 
-	CheckIDArray.nCtrlID[13] = IDC_CHECK_DECODE_KILLANDACTIVE;   CheckIDArray.nOffset[13] =   SETTING_DECODE_EN  ;
+	CheckIDArray.nCtrlID[13] = IDC_CHECK_DECODE_KILL;				CheckIDArray.nOffset[13] =   SETTING_DECODE_EN  ;
 	CheckIDArray.nCtrlID[14] = IDC_CHECK_ALLOW_CALLALL;          CheckIDArray.nOffset[14] =   SETTING_CALLALL_EN  ;
 	CheckIDArray.nCtrlID[15] = IDC_CHECK_ALLOW_GROUPCALL;        CheckIDArray.nOffset[15] =   SETTING_CALLGRP_EN  ;
 	CheckIDArray.nCtrlID[16] = IDC_CHECK_ALLOW_ADD_CONTACT;      CheckIDArray.nOffset[16] =  SETTING_CREATE_CONTENT_EN   ;
@@ -256,7 +256,7 @@ void	CRadioSetView::LoadData()
 			if (it!=mapChannel.end())
 			{
 				int nSel = (int)it->first;
-				((CComboBox*)GetDlgItem(CheckIDArray.nCtrlID[i]))->SetCurSel(nSel);
+				((CComboBox*)GetDlgItem(CheckIDArray.nCtrlID[i]))->SetCurSel(nSel+1);
 			}
 		}
 	}
@@ -499,6 +499,8 @@ void	CRadioSetView::LoadComboString()
 	m_cbBGLight.ResetContent();
 	m_cbVoxLvl.ResetContent();
 	m_cbNoiseLvl.ResetContent();
+	m_cbAlarmMode.ResetContent();
+	m_cbAlarmType.ResetContent();
 	for(i=0;i<sizeof(strIdleDisp)/sizeof(strIdleDisp[0]);i++)
 	{	
 		((CComboBox*)GetDlgItem(IDC_COMBO_MAINFRAME_STYLE))->AddString(strIdleDisp[i]);
@@ -796,16 +798,18 @@ void	CRadioSetView::EnableComboBoxes()
 		m_cbAlarmMode.EnableWindow(TRUE);
 		m_cbAlarmCh.EnableWindow(TRUE);
 		int nRet = m_cbAlarmMode.GetCurSel();
+		((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1))->EnableWindow(TRUE);
+		((CComboBox*)GetDlgItem(IDC_COMBO_EMER_2))->EnableWindow(TRUE);
 		if (nRet != 2)//±≥æ∞“Ù
 		{
-			for (i=0;i<4;i++)
+			for (i=2;i<4;i++)
 			{
 				((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1+i))->EnableWindow(FALSE);
 			}
 		}
 		else
 		{
-			for (i=0;i<4;i++)
+			for (i=2;i<4;i++)
 			{
 				((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1+i))->EnableWindow(TRUE);
 			}
@@ -837,6 +841,9 @@ void	CRadioSetView::EnableComboBoxes()
 	}
 	else
 		m_editBKLightDelay.EnableWindow(FALSE);
+	// °µÁƒ£ Ω
+	nSel = GetSettingValue(SETTING_POWERSAVE_EN);
+	m_cbPowerSaveLvl.EnableWindow(nSel);
 }
 void CRadioSetView::OnSelchangeComboTone() 
 {
@@ -866,16 +873,18 @@ void CRadioSetView::OnSelchangeComboAlarmMode()
 	// TODO: Add your control notification handler code here
 	int nSel = m_cbAlarmMode.GetCurSel();
 	int i=0;
+	((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1))->EnableWindow(TRUE);
+	((CComboBox*)GetDlgItem(IDC_COMBO_EMER_2))->EnableWindow(TRUE);
 	if (nSel !=2)//±≥æ∞“Ù∑¢ÀÕ
 	{
-		for (;i<4;i++)
+		for (i=2;i<4;i++)
 		{
 			((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1+i))->EnableWindow(FALSE);
 		}
 	}
 	else
 	{
-		for (;i<4;i++)
+		for (i=2;i<4;i++)
 		{
 			((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1+i))->EnableWindow(TRUE);
 		}
@@ -900,16 +909,18 @@ void	CRadioSetView::OnSelchangeComboAlarmType()
 		m_cbAlarmMode.EnableWindow(TRUE);
 		m_cbAlarmCh.EnableWindow(TRUE);
 		int nRet = m_cbAlarmMode.GetCurSel();
+		((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1))->EnableWindow(TRUE);
+		((CComboBox*)GetDlgItem(IDC_COMBO_EMER_2))->EnableWindow(TRUE);
 		if (nRet != 2)//±≥æ∞“Ù
 		{
-			for (i=0;i<4;i++)
+			for (i=2;i<4;i++)
 			{
 				((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1+i))->EnableWindow(FALSE);
 			}
 		}
 		else
 		{
-			for (i=0;i<4;i++)
+			for (i=2;i<4;i++)
 			{
 				((CComboBox*)GetDlgItem(IDC_COMBO_EMER_1+i))->EnableWindow(TRUE);
 			}
