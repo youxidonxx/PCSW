@@ -56,8 +56,13 @@
 // 	}
 // 		//#define ERASE_BKGND_END
 
-extern	void	ConvertCString2String(CString&	strSrc,std::string&	strDes);
+extern	CString		ConvertStrintToStrhex(CString&	strInt);
 
+extern	void	ConvertCString2String(CString&	strSrc,std::string&	strDes);
+//nLen还同时返回作为调用方的长度参考,只能转换freq频点，
+extern	BYTE*	ConvertStrToIntArray(CString	str,int& nLen);
+//基本只用于存储7位ID号码
+extern	BYTE*	ConvertStrTo7ID(CString str,int nLen);
 
 /////////////////////////////////////////////////////////////////////////////
 // CPCSWApp:
@@ -104,6 +109,8 @@ public:
 	CPtrArray	m_Frame;
 
 	CommInfo	m_CommInfo;
+public:
+	void		UpdateActiveView();
 public:
 	//
 	void		SetFreqScope(int nRange);

@@ -235,7 +235,11 @@ void	CMainFrame::TransferCommData()
 	memcpy(&theApp.m_CommInfo.pGroupList,iCommEvent.pGroupList,sizeof(theApp.m_CommInfo.pGroupList));
 	memcpy(&theApp.m_CommInfo.pShortText,iCommEvent.pShortText,sizeof(theApp.m_CommInfo.pShortText));
 
-	CMainFrame*	pFrame = (CMainFrame*)AfxGetMainWnd();
+// 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+	((CPCSWApp*)AfxGetApp())->UpdateActiveView();
+// 	UINT	style = pFrame->m_wndToolBar.GetButtonStyle(4);
+// 	CFormView*	pView = (CFormView*)(m_wndSplit.GetPane(0,1));
+// 	pView->UpdateWindow();
 // 	CWnd*	pView = (CWnd*)pFrame->m_wndSplit.GetPane(0,1);
 // 	MDIActivate(pView);
  }
@@ -731,7 +735,10 @@ UINT	ThraedComm(LPVOID lpParam)
  			WriteParameter(szBuff,pEvent);
 			AfxMessageBox("写频完毕");
 		}
-
+		if (!pEvent->bRead)
+		{
+			Sleep(5000);
+		}
 		/////////接下来是令参数生效////////////////////
 		//5F 5F 10 00 00 03 00 2B 02 00 95 11 04 00 20 12 20 12 FF FF 55 AA
 		pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
@@ -746,6 +753,7 @@ UINT	ThraedComm(LPVOID lpParam)
 	{
 			((CMainFrame*)pEvent->pMainframe)->UpdateAllViews(1);
 			((CMainFrame*)pEvent->pMainframe)->TransferCommData();
+//			CView*	pView = (CView*)((CMainFrame*)pEvent->pMainframe)->m_wndSplit.GetPane(0,1);
 /*			POSITION	pos;
 			CPCSWDoc*	pDoc = (CFrameWnd*)GetDocument();
 			pos = ((CDocTemplate*)((CPCSWApp*)AfxGetApp())->m_template[0])->GetFirstDocPosition();
@@ -1041,19 +1049,30 @@ CPCSWDoc*	CMainFrame::GetDocument()
 	iCommEvent.bRead = FALSE;		//要么读取，要么写入
 	iCommEvent.pSerial = &m_SerialPort;
 
-	iCommEvent.pRadioInfo = GetDocument()->pRadioInfo;
-	iCommEvent.pRadioSetting = GetDocument()->pRadioSetting;
-	iCommEvent.pMenuSetting = GetDocument()->pMenuSetting;
-	iCommEvent.pEmergencySetting = GetDocument()->pEmerSetting;
-	iCommEvent.pKeyFunctionSetting = GetDocument()->pKeySetting;
+	iCommEvent.pRadioInfo = theApp.m_CommInfo.pRadioInfo;
+		//GetDocument()->pRadioInfo;
+	iCommEvent.pRadioSetting =theApp.m_CommInfo.pRadioSetting;
+		//GetDocument()->pRadioSetting;
+	iCommEvent.pMenuSetting =theApp.m_CommInfo.pMenuSetting;
+	// GetDocument()->pMenuSetting;
+	iCommEvent.pEmergencySetting = theApp.m_CommInfo.pEmergencySetting;
+	//GetDocument()->pEmerSetting;
+	iCommEvent.pKeyFunctionSetting = theApp.m_CommInfo.pKeyFunctionSetting;
+	//GetDocument()->pKeySetting;
 
 
-	iCommEvent.pZoneInfo = GetDocument()->pZoneInfo;
-	iCommEvent.pChannelInfo = GetDocument()->pChannelInfo;
-	iCommEvent.pScanInfo = GetDocument()->pScanInfo;
-	iCommEvent.pContactInfo = GetDocument()->pContact;
-	iCommEvent.pGroupList = GetDocument()->pGrouplist;
-	iCommEvent.pShortText = GetDocument()->pShortText;
+	iCommEvent.pZoneInfo = theApp.m_CommInfo.pZoneInfo;
+	//GetDocument()->pZoneInfo;
+	iCommEvent.pChannelInfo =theApp.m_CommInfo.pChannelInfo;
+	//GetDocument()->pChannelInfo;
+	iCommEvent.pScanInfo = theApp.m_CommInfo.pScanInfo;
+	//GetDocument()->pScanInfo;
+	iCommEvent.pContactInfo = theApp.m_CommInfo.pContactInfo;
+	//GetDocument()->pContact;
+	iCommEvent.pGroupList = theApp.m_CommInfo.pGroupList;
+	//GetDocument()->pGrouplist;
+	iCommEvent.pShortText = theApp.m_CommInfo.pShortText;
+	//GetDocument()->pShortText;
 
 	ZeroMemory(iCommEvent.bChannelExist,16);//防止有信道没有被设置
 	ZeroMemory(iCommEvent.bZoneExist,16);	//防止有区域没有被设置

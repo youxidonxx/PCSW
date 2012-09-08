@@ -156,11 +156,7 @@ void	CPropPageSMS::LoadRowInfo(int nRow,int nCol)
 		item.szText = sms;
 		m_gridCtrl.SetItem(&item);
 	}
-	else
-	{
-//		m_gridCtrl.SetFixedRowCount(nRow);
-	}
-
+ 
 }
 void CPropPageSMS::OnGridEdit(NMHDR* pNMHDR, LRESULT* pResult)
 {
@@ -278,6 +274,7 @@ void CPropPageSMS::OnEnKillfocusEditSms()
 		m_gridEdit.GetWindowText(str);
 		int		nlen = str.GetLength();
 		int		nRow = cell.row;
+		((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTNUM,nRow,nRow);
 		((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTLEN,nRow,nlen);
 		((CPCSWApp*)AfxGetApp())->SetSmsContent(SMS_TXTCONTENT,nRow,str,nlen);
 

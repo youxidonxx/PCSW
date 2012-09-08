@@ -115,12 +115,13 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 	afx_msg LRESULT ShowChildWindow(WPARAM wParam,LPARAM lParam);
+	CSplitterWnd	m_wndSplit;
+	CToolBar    m_wndToolBar;
 
 protected:  // control bar embedded members
 	CStatusBar  m_wndStatusBar;
-	CToolBar    m_wndToolBar;
 
-	CSplitterWndEx	m_wndSplit;
+//	CSplitterWndEx	m_wndSplit;
 // Generated message map functions
 protected:
 	//{{AFX_MSG(CMainFrame)

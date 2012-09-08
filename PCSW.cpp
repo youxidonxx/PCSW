@@ -24,6 +24,13 @@ static char THIS_FILE[] = __FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CPCSWApp
+#ifdef _DEBUG
+#ifdef _CONSOLE
+HANDLE	hConsoleHandle;
+DWORD	dwPreLength,dwActualLength;
+#endif // _CONSOLE
+#endif // _DEBUG
+
 
 BEGIN_MESSAGE_MAP(CPCSWApp, CWinApp)
 	//{{AFX_MSG_MAP(CPCSWApp)
@@ -41,7 +48,28 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CPCSWApp construction
 
-
+CString		ConvertStrintToStrhex(CString&	strInt)
+{
+	if(strInt.IsEmpty())
+		return strInt;
+	CString	strHex,str;
+	str = strInt;
+	if(strInt.Find('.') < 0)
+		str += ".000000";		//未输入小数部分
+	else
+		str += "000000";		//小数部分位数不足
+	int nIndex = str.Find('.');
+	str.Insert(nIndex+7,'.');
+	str.Delete(nIndex);
+	long	lTmp1 = _ttoi(LPCTSTR(str));
+	long	lTmp2 = ((lTmp1+75)/12500)*12500;
+	if(lTmp1/100 == lTmp2/100)
+		lTmp1 = lTmp2;
+	else
+		lTmp1 = (lTmp1/12500)*12500;
+	str.Format("%X",lTmp1);
+	return str;
+}
 void	ConvertCString2String(CString&	strSrc,std::string&	strDes)
 {
 #ifndef UNICODE
@@ -53,7 +81,58 @@ void	ConvertCString2String(CString&	strSrc,std::string&	strDes)
 #endif
 }
 
-
+BYTE*	ConvertStrToIntArray(CString	str,int& nLen)//nLen还同时返回作为调用方的长度参考
+{
+	BYTE*	data = new BYTE[nLen];
+	ZeroMemory(data,nLen);
+	if(str.IsEmpty())
+		return data;
+	int nPos = str.Find('.');
+	if(nPos>=0)
+		str.Delete(nPos);
+	int	len = str.GetLength();
+	BYTE	ch;
+	int i;
+	if(len >nLen*2)//需要有最大长度
+		len = nLen*2;
+	else if (len<nLen*2)
+	{
+		for (i=nLen*2-len-1;i>=0;i--)
+		{
+			str.Insert(nLen*2-i,'0');
+		}
+		len = nLen*2;
+	}
+	str.MakeUpper();
+	str = str.Left(len);
+	for (i=len-1;i>=0;i--)
+	{
+		ch = str.GetAt(i);
+		if(ch>='0'&&ch<='9')
+			ch = ch-'0';
+		else if((ch>='A')&&(ch<='F'))
+			ch=ch-'A'+10;
+		else
+			break;
+		if(i%2==0)
+			data[(len-i)/2-1] = (data[(len-i)/2-1]&0x0f)|ch<<4;
+		else
+			data[(len-i)/2] = (data[(len-i)/2]&0xf0)|ch;
+	}
+	nLen = len;
+	return data;
+}
+BYTE*	ConvertStrTo7ID(CString str,int nLen)
+{
+	BYTE*	data = new BYTE[nLen];
+	ZeroMemory(data,nLen);
+	if(str.IsEmpty())
+		return data;
+	int nPos = str.Find('.');
+	if(nPos>=0)
+		str.Delete(nPos);
+	return data;
+}
 CPCSWApp::CPCSWApp()
 {
 	// TODO: add construction code here,
@@ -180,7 +259,12 @@ BOOL CPCSWApp::InitInstance()
 	// The main window has been initialized, so show and update it.
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
-
+#ifdef _DEBUG
+#ifdef _CONSOLE
+	AllocConsole();
+	hConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif // _CONSOLE
+#endif // _DEBUG
 // 	pMainFrame->UpdateAllViews(0);
 	return TRUE;
 }
@@ -315,7 +399,19 @@ void CPCSWApp::OnFileOpen()
 	file.Read(m_CommInfo.pGroupList,sizeof(m_CommInfo.pGroupList));
 	file.Read(m_CommInfo.pShortText,sizeof(m_CommInfo.pShortText));
 
+// 	 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+// // 	 	CView*	pView = (CView*)pFrame->m_wndSplit.GetPane(0,1);
+// 		UINT	style = pFrame->m_wndToolBar.GetButtonStyle(4);
+// 		int		nRowCnt = pFrame->m_wndSplit.GetRowCount();
+			//(ID_APP_ABOUT);
+// 		pView->UpdateWindow();
 // 	file.Close();
+		UpdateActiveView();
+}
+void	CPCSWApp::UpdateActiveView()
+{
+	CMainFrame*	pFrame = (CMainFrame*)AfxGetMainWnd();
+//	CView*	pView = (CView*)pFrame->m_wndSplit.GetPane(0,1);
 }
 void	CPCSWApp::OnFileSave()
 {

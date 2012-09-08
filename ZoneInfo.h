@@ -41,33 +41,35 @@ public:
 	int	m_nCurrentZone;	//当前区域
 // Attributes
 public:
-	int		GetFreqScope();
-	int		GetChancountsInZone(int nZone,int nFlag);
-	int		GetChaninfoInChannel(int nZone,int nCh,int nFlag);
-	CString	GetChanFreq(int nFlag,int nZone,int nChannel);
-	CString	GetVoiceEncryptCode(int nFlag,int nZone,int nChannel);
-	//默认获取信道名称，否则获取区域名称
-	CString	GetName(int nZone,int nCh,int nFlag,int nLen,int nStep1 = 736,int nStep2 = 46,bool	bCh = true);
 	void	SetCStaticZoneNum();
 	void	SetZonename();
 	void	SetName(int nZone,int nCh,int nFlag,int nLen,CString&	str,
 				int nStep1 = 736,int nStep2 = 46,bool	bCh = true);
 	void	SetInfo(int nZone,int nCh,int nFlag,int nVal,int nStep1 = 736,int nStep2 = 46,bool bCh = true);
 	void	SetDefaultData();
+	void	SetReadonlyGrid(int nRow,int nCol,bool bRead);
 	void	LoadRowInfo(int nRow,int nMaxCol);
 	void	LoadData();
 	void	LoadScanlist();
 	void	LoadContactlist();
 	void	LoadGrplist();
-	CString	GetByteInfo(int nTmp,int nAddr);
-	CString	GetSpecialInfo(int nAddr,int nChnum,int nZonenum);
 	//使能数字/模拟模式信息
-	BOOL	EnableDigitOrAnalog(int nRow);
-	bool	EnableOtherGrids(int nRow,int nCol);
 	void	EnableButtons();
-	void	SetReadonlyGrid(int nRow,int nCol,bool bRead);
+	void	FreqCheckSame(int nMode,int nZone,int nRow);//当中转/直通时，检查频点是否符合信道模式要求
 	//DCS/CTC50初始化
 	void	DcsCtcData(int nSelType);
+	BOOL	EnableDigitOrAnalog(int nRow);
+	bool	EnableOtherGrids(int nRow,int nCol);
+	bool	IsFreqMatch(CString&	str);//频点输入完毕后检查是否符合边界
+	int		GetFreqScope();
+	int		GetChancountsInZone(int nZone,int nFlag);
+	int		GetChaninfoInChannel(int nZone,int nCh,int nFlag);
+	CString	GetByteInfo(int nTmp,int nAddr);
+	CString	GetSpecialInfo(int nAddr,int nChnum,int nZonenum);
+	CString	GetChanFreq(int nFlag,int nZone,int nChannel);
+	CString	GetVoiceEncryptCode(int nFlag,int nZone,int nChannel);
+	//默认获取信道名称，否则获取区域名称
+	CString	GetName(int nZone,int nCh,int nFlag,int nLen,int nStep1 = 736,int nStep2 = 46,bool	bCh = true);
 // Operations
 public:
 

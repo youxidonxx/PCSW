@@ -90,64 +90,65 @@ void	CMyPropSheet::LoadData()
 BOOL CMyPropSheet::PreTranslateMessage(MSG* pMsg) 
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if ((pMsg->message == WM_SYSKEYDOWN) && (pMsg->wParam > 32)) 
-	{
-		CTabCtrl *pTab = GetTabControl();
-		int n = pTab->GetItemCount();
-
-		char buf[80], shortcut[3];
-		TC_ITEM tcItem;
-		tcItem.mask = TCIF_TEXT;
-		tcItem.pszText = buf;
-		shortcut[0] = '&';
-		shortcut[2] = '\0';
-		for (int i = 0; i < n; i++ ) {
-			tcItem.cchTextMax = sizeof(buf)-1;
-			pTab->GetItem(i, &tcItem);
-			shortcut[1] = (char)pMsg->wParam;
-			if (strstr(buf, shortcut)) {
- 					SetActivePage(i);
-				return TRUE;
-			}
-			else {
-				shortcut[1] = (char)(isupper(pMsg->wParam) ? tolower : toupper)(pMsg->wParam);
-				if (strstr(buf, shortcut)) {
- 						SetActivePage(i);
-					return TRUE;
-				}
-			}
-		}
-	}
-
-	// allow view to pre-translate for hotkeys
-	CView	*pView = (CView*)GetParent();
-	if (pView->PreTranslateMessage(pMsg))
-		return TRUE;
-		
+// 	if ((pMsg->message == WM_SYSKEYDOWN) && (pMsg->wParam > 32)) 
+// 	{
+// 		CTabCtrl *pTab = GetTabControl();
+// 		int n = pTab->GetItemCount();
+// 
+// 		char buf[80], shortcut[3];
+// 		TC_ITEM tcItem;
+// 		tcItem.mask = TCIF_TEXT;
+// 		tcItem.pszText = buf;
+// 		shortcut[0] = '&';
+// 		shortcut[2] = '\0';
+// 		for (int i = 0; i < n; i++ ) {
+// 			tcItem.cchTextMax = sizeof(buf)-1;
+// 			pTab->GetItem(i, &tcItem);
+// 			shortcut[1] = (char)pMsg->wParam;
+// 			if (strstr(buf, shortcut)) {
+//  					SetActivePage(i);
+// 				return TRUE;
+// 			}
+// 			else {
+// 				shortcut[1] = (char)(isupper(pMsg->wParam) ? tolower : toupper)(pMsg->wParam);
+// 				if (strstr(buf, shortcut)) {
+//  						SetActivePage(i);
+// 					return TRUE;
+// 				}
+// 			}
+// 		}
+// 	}
+// 
+// 	// allow view to pre-translate for hotkeys
+// 	CView	*pView = (CView*)GetParent();
+// 	if (pView->PreTranslateMessage(pMsg))
+// 		return TRUE;
+// 		
 	return CPropertySheet::PreTranslateMessage(pMsg);
 }
 
 BOOL CMyPropSheet::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult) 
 {
 	// TODO: Add your specialized code here and/or call the base class
-	NMHDR*	pnmh = (LPNMHDR)lParam;
-	if(pnmh->code == TCN_SELCHANGING)
-		m_nActive = GetActiveIndex();
-	else if (pnmh->code == TCN_SELCHANGE)
-	{
-			CView	*pView = (CView*)GetParent();
-			static NMHDR	nmh = *pnmh;
-			pView->PostMessage(WM_NOTIFY, wParam, (LPARAM)&nmh);
-	}
+// 	NMHDR*	pnmh = (LPNMHDR)lParam;
+// 	if(pnmh->code == TCN_SELCHANGING)
+// 		m_nActive = GetActiveIndex();
+// 	else if (pnmh->code == TCN_SELCHANGE)
+// 	{
+// 			CView	*pView = (CView*)GetParent();
+// 			static NMHDR	nmh = *pnmh;
+// 			pView->PostMessage(WM_NOTIFY, wParam, (LPARAM)&nmh);
+// 	}
 	return CPropertySheet::OnNotify(wParam, lParam, pResult);
 }
 LRESULT CMyPropSheet::OnAdjust(WPARAM wParam, LPARAM lParam)
 {
-	AdjustPages();
+// 	AdjustPages();
 	return 0;
 }
 void CMyPropSheet::AdjustPages()
 {
+/*
 	CRect rect;
 	
 	GetClientRect(&rect);
@@ -188,5 +189,5 @@ void CMyPropSheet::AdjustPages()
 		else if (pPage->IsKindOf(RUNTIME_CLASS(CPropPageSMS)))
 		{
 		}
-	}
+	}*/
 }

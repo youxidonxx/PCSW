@@ -4,8 +4,7 @@
 #include "stdafx.h"
 #include "PCSW.h"
 #include "DpmrView.h"
-
-#ifdef _DEBUG
+ #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;

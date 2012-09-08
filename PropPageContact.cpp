@@ -26,6 +26,8 @@ CPropPageContact::CPropPageContact() : CPropertyPage(CPropPageContact::IDD)
 	//}}AFX_DATA_INIT
 	m_pCont = new byte[0x2000];
 	m_Cnt = 0;
+	m_focusCell.row = -1;
+	m_focusCell.col = -1;
 }
 
 CPropPageContact::~CPropPageContact()
@@ -84,6 +86,7 @@ void	CPropPageContact::OnGridEdit(NMHDR * pNMHDR, LRESULT * pResult)
 	int i;
 	if(pInfo->item.col>=0 && pInfo->item.col<4)
 		m_gridCtrl.SetEditState(TRUE);
+	m_focusCell = m_gridCtrl.GetFocusCell();
 	switch(m_gridCtrl.GetFocusCell().col)
 	{
 	case 0://序号
@@ -124,11 +127,12 @@ void	CPropPageContact::LoadData()
 	{
 		m_Cnt = 1;
 	}
-	if (m_Cnt!=m_gridCtrl.GetRowCount()-1)
+// 	if (m_Cnt!=m_gridCtrl.GetRowCount()-1)
 	{
 		m_gridCtrl.SetRowCount(m_Cnt+1);
 		m_gridCtrl.SetColumnCount(CONTENT_COLUMN_NUM);
  		m_gridCtrl.SetFixedRowCount();
+		m_gridCtrl.SetFixedColumnCount();
 	}
 		int	nColumn[] = {50,80,80,120};
 	
@@ -247,6 +251,26 @@ void CPropPageContact::OnBnClickedButtonContAdd()
 void CPropPageContact::OnBnClickedButtonContDel()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	CCellID		cell =m_focusCell;
+		//m_gridCtrl.GetFocusCell();
+ 		//m_gridCtrl.GetFocusCell().row;
+	if (cell.row>0 && cell.row <=m_gridCtrl.GetRowCount())
+	{
+		int nCurrent,nLeft;
+		nCurrent = cell.row;
+		while (nCurrent<=m_Cnt)
+		{
+			memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pContactInfo[0x00+2+(nCurrent-1)*CONTACT_STRUCT_LEN],
+				&((CPCSWApp*)AfxGetApp())->m_CommInfo.pContactInfo[0x00+2+nCurrent*CONTACT_STRUCT_LEN],CONTACT_STRUCT_LEN);
+			((CPCSWApp*)AfxGetApp())->SetContInfo(CONTACT_NUM,nCurrent,nCurrent);
+			nCurrent++;
+		}
+		memset(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pContactInfo[0x00+2+(nCurrent-1)*CONTACT_STRUCT_LEN],
+			0x00,CONTACT_STRUCT_LEN);
+		m_Cnt--;
+		((CPCSWApp*)AfxGetApp())->SetContCount(m_Cnt*CONTACT_STRUCT_LEN);//总数设置
+	}
+	LoadData();
 }
 
 void CPropPageContact::OnCbnSelchangeComboType()

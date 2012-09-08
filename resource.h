@@ -111,7 +111,6 @@
 #define IDC_EDIT_KEYLOCK_DELAY          1046
 #define IDC_BUTTON_INSERT               1046
 #define IDC_BUTTON_ADD_SCANLIST         1046
-#define IDC_BUTTON_ADD2                 1046
 #define IDC_BUTTON_DEL                  1046
 #define IDC_SPIN_KEYLOCK_DELAY          1047
 #define IDC_BUTTON_DELETE               1047
@@ -218,6 +217,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32777
 #define _APS_NEXT_CONTROL_VALUE         1103
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

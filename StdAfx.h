@@ -33,6 +33,7 @@
 #include <afxcview.h>
 #include <afxdisp.h>
 
+#include <iostream> 
 using namespace std;
 #include <map>//STL头文件，不用添加.h  用于map容器使用
 #include <algorithm>//
@@ -174,7 +175,7 @@ enum	SettingAddress
 };
 enum	CONTAddr
 {
-	CONTACT_NUM = 0X00,
+	CONTACT_NUM = 0X00,//序号
 	CONTACT_TYPE = 0X01,
 	CONTACT_NAME = 0X02,	//16BYTE
 	CONTACT_ID	= 0X12		//4BYTE

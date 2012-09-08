@@ -453,6 +453,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="MenuKeyView.h"
+				>
+			</File>
+			<File
 				RelativePath="MenuSet.cpp"
 				>
 				<FileConfiguration
@@ -969,7 +973,7 @@
 			>
 		</File>
 		<File
-			RelativePath="MenuKeyView.h"
+			RelativePath=".\MyFormView.h"
 			>
 		</File>
 		<File

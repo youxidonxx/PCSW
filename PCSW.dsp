@@ -183,6 +183,10 @@ SOURCE=.\mybar.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\MyFormView.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\MyPropSheet.cpp
 # End Source File
 # Begin Source File
@@ -378,6 +382,10 @@ SOURCE=.\GridView.h
 # Begin Source File
 
 SOURCE=.\MenuKeyView.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MyFormView.h
 # End Source File
 # Begin Source File
 

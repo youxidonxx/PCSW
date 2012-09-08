@@ -120,7 +120,10 @@ CPCSWDoc* CPCSWView::GetDocument() // non-debug version is inline
 	return (CPCSWDoc*)m_pDocument;
 }
 #endif //_DEBUG
-
+void	CPCSWView::UpdateWindow()
+{
+	LoadData();
+}
 /////////////////////////////////////////////////////////////////////////////
 // CPCSWView message handlers
  

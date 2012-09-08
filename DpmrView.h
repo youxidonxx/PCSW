@@ -9,7 +9,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CDpmrView form view
-#include "PCSWDoc.h"
+ #include "PCSWDoc.h"
 #include "MyPropSheet.h"
 #include "PropPageContact.h"
 #include "PropPageSMS.h"

@@ -23,8 +23,9 @@ public:
 	CPropPageContact();
 	~CPropPageContact();
 
-	byte*	m_pCont;
 	int		m_Cnt;
+	CCellID		m_focusCell;
+	byte*	m_pCont;
 	void	LoadData();
 // 	CString	GetContName(int nGrp,int nLen);
 // 	CString	GetContID(int nGrp,int nLen);
@@ -37,6 +38,8 @@ public:
 	CGridEdit	m_editContent;
 	CGridCtrl	m_gridCtrl;
 	//}}AFX_DATA
+
+
 
 	virtual	void	GetOriginalRect(CRect *pRect);
 // Overrides

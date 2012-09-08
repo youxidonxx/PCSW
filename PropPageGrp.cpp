@@ -283,7 +283,7 @@ void CPropPageGrp::OnBnClickedButtonAdd()
 				{
 					ConvertCString2String(str,s);
 					map_it = find_if(mapAllGrp.begin(),mapAllGrp.end(),map_value_finder_string(s));
-// 					if (map_it==mapUsedGrp.end())//Î´ÕÒµ½
+					if (map_it!=mapAllGrp.end())//Î´ÕÒµ½
 						// 				if(nIndex!=-1)//Î´ÕÒµ½
 					{
 						((CPCSWApp*)AfxGetApp())->SetGrplistContnum(GRP_CONTACT_NUM,m_nCurrentGrp,i+1+nCnt,int(map_it->first));

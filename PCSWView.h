@@ -29,6 +29,7 @@ public:
 
 // Attributes
 public:
+	virtual		void		UpdateWindow();
 	CPCSWDoc* GetDocument();
 	void		LoadData();
 	CString		GetAllVersion(int nFlag,int nLen);

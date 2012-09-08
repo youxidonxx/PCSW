@@ -154,6 +154,7 @@ void CZoneInfo::OnInitialUpdate()
 	CFormView::OnInitialUpdate();
 	
 	ModifyStyle(0,WS_CLIPCHILDREN|WS_CLIPSIBLINGS);
+	m_GridCtrl.SetDoubleBuffering();
 	// TODO: Add your specialized code here and/or call the base class
 	//获取到每个区域的有效信道数
 	m_nZonenum = 0;
@@ -286,7 +287,7 @@ CString	CZoneInfo::GetVoiceEncryptCode(int nFlag,int nZone,int nChannel)
 /************************************************************************/
 void	CZoneInfo::LoadData()
 {
-// 	m_GridCtrl.DeleteAllItems();
+	m_GridCtrl.DeleteAllItems();
 	m_nZonenum = 0;
 	for (int i=1;i<=16;i++)
 	{
@@ -307,7 +308,7 @@ void	CZoneInfo::LoadData()
 	}
 	int nChnum = m_nZonechalnum[m_nCurrentZone-1];
 	int nLen = 21;//CHANNEL_STRUCT_INFO;
-	if (m_GridCtrl.GetRowCount()!=nChnum)
+// 	if (m_GridCtrl.GetRowCount()!=nChnum)
 	{
 		TRY 
 		{
@@ -677,18 +678,28 @@ void	CZoneInfo::SetReadonlyGrid(int nRow,int nCol,bool bRead)
 	GV_ITEM item;
 	item.col = nCol;
 	item.row = nRow;
-	item.nFormat = DT_CENTER|DT_SINGLELINE|DT_VCENTER;
-	item.szText = m_GridCtrl.GetItemText(nRow,nCol);
+// 	item.nFormat = DT_CENTER|DT_SINGLELINE|DT_VCENTER;
+// 	item.szText = m_GridCtrl.GetItemText(nRow,nCol);
 	if(bRead)
 	{
+		item.nFormat = DT_CENTER|DT_SINGLELINE|DT_VCENTER;
+		item.szText = m_GridCtrl.GetItemText(nRow,nCol);
 		item.mask = GVIF_TEXT|GVIF_FORMAT|GVIS_READONLY;
-		m_GridCtrl.SetItemBkColour(nRow,item.col,RGB(125,125,125));//GetSysColor(COLOR_3DFACE));
-		m_GridCtrl.SetItemFgColour(nRow,item.col,RGB(225,225,225));//GetSysColor(COLOR_GRAYTEXT));
+		m_GridCtrl.SetItemBkColour(nRow,item.col,RGB(75,125,75));//GetSysColor(COLOR_3DFACE));
+		m_GridCtrl.SetItemFgColour(nRow,item.col,RGB(25,225,125));//GetSysColor(COLOR_GRAYTEXT));
+		m_GridCtrl.SetItem(&item);
 	}
 	else
+	{
+		item.nFormat = DT_CENTER|DT_SINGLELINE|DT_VCENTER;
+		item.szText = m_GridCtrl.GetItemText(nRow,nCol);
 		item.mask = GVIF_TEXT|GVIF_FORMAT;
-	m_GridCtrl.SetItem(&item);
-
+//  		m_GridCtrl.SetItemBkColour(nRow,item.col);//GetSysColor(COLOR_3DFACE));
+// 		m_GridCtrl.SetItemFgColour(nRow,item.col);//GetSysColor(COLOR_GRAYTEXT));
+		m_GridCtrl.SetItem(&item);
+	}
+// 	m_GridCtrl.SetItem(&item);
+//
 }
 void	CZoneInfo::EnableButtons()
 {
@@ -730,6 +741,7 @@ bool	CZoneInfo::EnableOtherGrids(int nRow,int nCol)
 			{
 				SetReadonlyGrid(nRow,nCol+1,TRUE);
  			}
+// 			FreqCheckSame(nSel,m_nCurrentZone,nRow);
 		}
 		break;
 	case 13://发射信令类型
@@ -811,8 +823,8 @@ BOOL	CZoneInfo::EnableDigitOrAnalog(int nRow)
 						item.mask = GVIF_TEXT|GVIF_FORMAT|GVIS_READONLY;
 						item.szText = m_GridCtrl.GetItemText(nRow,item.col);
 						//背景框颜色设置
-						m_GridCtrl.SetItemBkColour(nRow,item.col,RGB(125,125,125));//GetSysColor(COLOR_3DFACE));
-						m_GridCtrl.SetItemFgColour(nRow,item.col,RGB(225,225,225));//GetSysColor(COLOR_GRAYTEXT));
+						m_GridCtrl.SetItemBkColour(nRow,item.col,RGB(25,12,215));//GetSysColor(COLOR_3DFACE));
+						m_GridCtrl.SetItemFgColour(nRow,item.col,RGB(75,225,125));//GetSysColor(COLOR_GRAYTEXT));
 						m_GridCtrl.SetItem(&item);
 					}
 					break;
@@ -845,8 +857,8 @@ BOOL	CZoneInfo::EnableDigitOrAnalog(int nRow)
 					item.mask = GVIF_TEXT|GVIF_FORMAT|GVIS_READONLY;
 					item.szText = m_GridCtrl.GetItemText(nRow,item.col);
 					//背景框颜色设置
-					m_GridCtrl.SetItemBkColour(nRow,item.col,RGB(125,125,125));//GetSysColor(COLOR_3DFACE));
-					m_GridCtrl.SetItemFgColour(nRow,item.col,RGB(225,225,225));//GetSysColor(COLOR_GRAYTEXT));
+					m_GridCtrl.SetItemBkColour(nRow,item.col,RGB(225,125,225));//GetSysColor(COLOR_3DFACE));
+					m_GridCtrl.SetItemFgColour(nRow,item.col,RGB(25,50,125));//GetSysColor(COLOR_GRAYTEXT));
 					m_GridCtrl.SetItem(&item);
 				}
 				break;
@@ -863,6 +875,67 @@ BOOL	CZoneInfo::EnableDigitOrAnalog(int nRow)
 		return TRUE;
 	}
 	return FALSE;
+}
+bool	CZoneInfo::IsFreqMatch(CString& str)
+{
+	if(str.IsEmpty())
+		return false;
+	int nMax = ((CPCSWApp*)AfxGetApp())->GetFreqBoundry();
+	int nMin = ((CPCSWApp*)AfxGetApp())->GetFreqBoundry(false);
+	nMax*=1000000;
+	nMin*=1000000;
+	CString	strTmp = str;
+	if(str.Find('.')>=0)
+		strTmp+="000000";
+	else
+		strTmp+=".000000";
+	int nIndex = strTmp.Find('.');
+	strTmp.Insert(nIndex+7,'.');
+	strTmp.Delete(nIndex);
+	long	ll,l1;
+	ll = _ttoi(LPCTSTR(strTmp));	
+	l1 = ((ll+75)/12500)*12500;
+	if( (ll/100) == (l1/100) )
+		ll = l1;
+	else
+		ll = (ll/12500)*12500;
+	if(ll>=nMin && ll<=nMax)
+		return true;
+	else
+		return false;
+}
+void	CZoneInfo::FreqCheckSame(int nMode,int nZone,int nRow)
+{
+	if(nMode!=0 && nMode!=1)//信道类型选项不合要求
+		return;
+	CString		strTxFreq,strRxFreq;
+	strTxFreq =  GetChanFreq(CHANNEL_TX_FREQ,nZone,nRow);
+
+		//m_GridCtrl.GetItemText(nRow,6);
+	strRxFreq = GetChanFreq(CHANNEL_RX_FREQ,nZone,nRow);
+		//m_GridCtrl.GetItemText(nRow,7);
+	if(strRxFreq.IsEmpty() || strTxFreq.IsEmpty())
+		return;
+	if (nMode == 0)//直通模式
+	{
+		if (strRxFreq.CompareNoCase(strTxFreq)!=0)//不相同
+		{
+// 			AfxMessageBox("直通模式下收发频点应相同");
+			::MessageBox(NULL,"直通模式下收发频点应相同","提示",MB_OK);
+			m_GridCtrl.SetFocusCell(nRow,6);
+			return;
+		}
+	}
+	else if (nMode == 1)//中转
+	{
+		if (strRxFreq.CompareNoCase(strTxFreq)==0)//相同频点
+		{
+			::MessageBox(NULL,"中转模式下收发频点应不同","提示",MB_OK);
+//  			AfxMessageBox("中转模式下收发频点应不同");
+			m_GridCtrl.SetFocusCell(nRow,6);
+			return;
+		}
+	}
 }
 //将信令号输入到combo框中
 void	CZoneInfo::DcsCtcData(int nSelType)
@@ -1326,13 +1399,13 @@ void CZoneInfo::OnSelchangeComboZonelist()
 			SetInfo(m_nCurrentZone,cell.row,CHANNEL_SCANLIST,nSel);
 		}
 		break;
-	case 3:
+	case 3://工作模式，中转/直通
 		{
 			int nSel = m_GridComboZone.GetCurSel();
 			SetInfo(m_nCurrentZone,cell.row,CHANNEL_MODE,nSel);
 		}
 		break;
-	case 4:
+	case 4://
 		{
 			int nSel = m_GridComboZone.GetCurSel();
 			SetInfo(m_nCurrentZone,cell.row,CHANNEL_STATUS,nSel);
@@ -1457,27 +1530,76 @@ void CZoneInfo::OnEnKillfocusEditZone()
 			}
 		}
 		break;
-	case 6:
-	case 7://频点写入
+	case 6://TX
+	case 7://RX  频点写入
 		{
+			int		nOffset;
+			if(cell.col == 6)
+				nOffset = CHANNEL_TX_FREQ;
+			else
+				nOffset = CHANNEL_RX_FREQ;
 			int nFreqScope = GetFreqScope();
-			switch(nFreqScope)
-			{
-			case 0://136-150
-				{
-// 					long	lFerq = strtoul(str.GetBuffer(str.GetLength()),,10)
-				}
-				break;
-			case 1:
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			}
+// 			switch(nFreqScope)
+// 			{
+// 			case 0://136-150
+// 				{
+// // 					long	lFerq = strtoul(str.GetBuffer(str.GetLength()),,10)
+// 					if(IsFreqMatch(str))
+// 					{
+// 						int len = ZONE_CHANNEL_FREQ_BYTE;
+// 						str = ConvertStrintToStrhex(str);
+// 						BYTE*	freq = ConvertStrToIntArray(str,len);
+// 						memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pChannelInfo[0x00+nOffset+(m_nCurrentZone-1)*ZONE_STRUCT_LEN+(cell.row-1)*CHANNEL_STRUCT_LEN],
+// 							freq,ZONE_CHANNEL_FREQ_BYTE);
+// 					}
+// 				}
+// 				break;
+// 			case 1:
+// 				{
+// 					if(IsFreqMatch(str))
+// 					{
+// 						int len = ZONE_CHANNEL_FREQ_BYTE;
+// 						str = ConvertStrintToStrhex(str);
+// 						BYTE*	freq = ConvertStrToIntArray(str,len);
+// 						memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pChannelInfo[0x00+nOffset+(m_nCurrentZone-1)*ZONE_STRUCT_LEN+(cell.row-1)*CHANNEL_STRUCT_LEN],
+// 							freq,ZONE_CHANNEL_FREQ_BYTE);
+// 					}
+// 				}
+// 				break;
+// 			case 2:
+// 				{
+					if(IsFreqMatch(str))
+					{
+						int len = ZONE_CHANNEL_FREQ_BYTE;
+						str = ConvertStrintToStrhex(str);
+						BYTE*	freq = ConvertStrToIntArray(str,len);
+						memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pChannelInfo[0x00+nOffset+(m_nCurrentZone-1)*ZONE_STRUCT_LEN+(cell.row-1)*CHANNEL_STRUCT_LEN],
+							freq,ZONE_CHANNEL_FREQ_BYTE);
+					}
+					else
+					{
+						MessageBox("输入频点超出范围，请重新输入","提示");
+// 						m_GridCtrl.SetFocusCell(cell);
+					}
+// 				}
+// 				break;
+// 			case 3:
+// 				{
+// 					if(IsFreqMatch(str))
+// 					{
+// 						int len = ZONE_CHANNEL_FREQ_BYTE;
+// 						str = ConvertStrintToStrhex(str);
+// 						BYTE*	freq = ConvertStrToIntArray(str,len);
+// 						memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pChannelInfo[0x00+nOffset+(m_nCurrentZone-1)*ZONE_STRUCT_LEN+(cell.row-1)*CHANNEL_STRUCT_LEN],
+// 							freq,ZONE_CHANNEL_FREQ_BYTE);
+// 					}
+// 				}
+// 				break;
+// 			}
 		}
 			break;
 	}
+	LoadData();
 	m_GridEditZone.HideWindow();
 }
 
