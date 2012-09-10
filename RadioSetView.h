@@ -148,6 +148,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnCbnSelchangeComboAlarmChannel();
+public:
+	afx_msg void OnEnKillfocusEditID();
+	afx_msg void OnEnKillfocusEditAlarmID();
+public:
+	afx_msg void OnEnKillfocusEditAlarmName();
 };
 
 /////////////////////////////////////////////////////////////////////////////

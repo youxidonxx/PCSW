@@ -64,6 +64,8 @@ extern	BYTE*	ConvertStrToIntArray(CString	str,int& nLen);
 //基本只用于存储7位ID号码
 extern	BYTE*	ConvertStrTo7ID(CString str,int nLen);
 
+extern	void	AddStrTailZero(CString&	str,int nDesiredLen);
+
 /////////////////////////////////////////////////////////////////////////////
 // CPCSWApp:
 // See PCSW.cpp for the implementation of this class
@@ -116,6 +118,7 @@ public:
 	void		SetFreqScope(int nRange);
 	int			GetFreqScope();
 	int			GetFreqBoundry(bool bMax = true);//获取频率边界值
+	void		SetAlarmName(int nFlag,CString& str,int nLen);
 	//CONTACT联系人
 	CString		GetContName(int nGrp,int	nLen);
 	CString		GetContID(int nGrp,int nLen);

@@ -64,9 +64,13 @@ BOOL CPropPageContact::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 	
 	// TODO: Add extra initialization here
-	if(m_pCont!=NULL)
-		m_Cnt = m_pCont[0x00];
-  
+	m_pCont = ((CPCSWApp*)AfxGetApp())->m_CommInfo.pContactInfo;
+	if (m_pCont!=NULL)
+	{
+		m_Cnt = *(WORD*)m_pCont;
+		m_Cnt/=CONTACT_STRUCT_LEN;
+	}
+   
 	m_gridCtrl.SetRowCount(m_Cnt+1);
 	m_gridCtrl.SetColumnCount(CONTENT_COLUMN_NUM);
  	m_gridCtrl.SetFixedRowCount();
@@ -317,7 +321,14 @@ void CPropPageContact::OnEnKillfocusEditContent()
 	}
 	else if (cell.col == 3)//ºÅÂë
 	{
-		((CPCSWApp*)AfxGetApp())->SetContID(CONTACT_ID,cell.row,str);
+		AddStrTailZero(str,7);
+		BYTE*	dwID;
+		dwID = ConvertStrTo7ID(str,7);
+
+		memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pContactInfo[0x00+2+CONTACT_ID+(cell.row-1)*CONTACT_STRUCT_LEN],
+			dwID,sizeof(dwID));
+// 		((CPCSWApp*)AfxGetApp())->SetContID(CONTACT_ID,cell.row,str);
+
 	}
 	m_editContent.HideWindow();
 	LoadData();

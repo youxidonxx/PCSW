@@ -187,31 +187,12 @@ BOOL CPropPageSMS::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	
-	if (TCN_SELCHANGE == ((LPNMHDR)lParam)->code)
+ 	if (PSN_SETACTIVE == ((LPNMHDR)lParam)->code)
 	{		// just changed tabs
 		LoadData();
 	}
-	return CPropertyPage::OnNotify(wParam, lParam, pResult);
-}
-void	CPropPageSMS::GetOriginalRect(CRect *pRect)
-{
-	DLGTEMPLATE* pTmp = NULL;
-
-	pRect->SetRectEmpty();
-
-	if(m_hDialogTemplate)
-		pTmp = (DLGTEMPLATE*)m_hDialogTemplate;
-	else if (m_lpDialogTemplate)
-		pTmp = (DLGTEMPLATE*)m_lpDialogTemplate;
-
-	// Found it, Set the Rectangle
-	if (pTmp)
-	{
-		pRect->SetRect(0, 0, pTmp->cx, pTmp->cy);
-
-		//It's in Dialog units so convert
-		MapDialogRect(pRect);
-	}
+//	return TRUE;
+ 	return CPropertyPage::OnNotify(wParam, lParam, pResult);
 }
 void CPropPageSMS::OnBnClickedButtonAdd()
 {
@@ -226,6 +207,7 @@ void CPropPageSMS::OnBnClickedButtonAdd()
 		((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTLEN,m_nGridCnt,0);
 	}
 	LoadData();
+	m_gridCtrl.SetFocusCell(m_nGridCnt,1);
 }
 
 void CPropPageSMS::OnBnClickedButtonDel()
@@ -277,8 +259,22 @@ void CPropPageSMS::OnEnKillfocusEditSms()
 		((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTNUM,nRow,nRow);
 		((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTLEN,nRow,nlen);
 		((CPCSWApp*)AfxGetApp())->SetSmsContent(SMS_TXTCONTENT,nRow,str,nlen);
-
+		GV_ITEM	item;
+		item.row = nRow;
+		item.mask = GVIF_TEXT|GVIF_FORMAT ;
+		item.nFormat = DT_CENTER|DT_SINGLELINE|DT_VCENTER;	
+		//ÄÚÈÝ
+		item.col = 0;
+		CString	strID;
+		strID.Format("%d",nRow);
+		item.szText = strID;
+		m_gridCtrl.SetItem(&item);
+		//ÄÚÈÝ
+		item.col++;
+		item.szText = str;
+		m_gridCtrl.SetItem(&item);
+		
 	}
 	m_gridEdit.HideWindow();
-	LoadData();
+//	LoadData();
 }

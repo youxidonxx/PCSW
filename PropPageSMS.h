@@ -36,8 +36,7 @@ public:
 	int			m_nGridCnt;
 	byte*		m_pSms;
 
-	virtual	void	GetOriginalRect(CRect *pRect);
-// Overrides
+ // Overrides
 	// ClassWizard generate virtual function overrides
 	//{{AFX_VIRTUAL(CPropPageSMS)
 	protected:
@@ -60,6 +59,7 @@ public:
 	afx_msg void OnBnClickedButtonDel();
 public:
 	afx_msg void OnEnKillfocusEditSms();
+
 };
 
 //{{AFX_INSERT_LOCATION}}

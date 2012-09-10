@@ -301,11 +301,63 @@ void CPropPageGrp::OnBnClickedButtonAdd()
 		END_CATCH	
 	}
 	LoadData();
+	m_editName.SetFocus();
 }
 
 void CPropPageGrp::OnBnClickedButtonDelete()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	int nMultiSel = m_listUsedMember.GetSelCount();
+	if (nMultiSel == 0)
+	{
+		MessageBox("请在右边边框中选择要删除项目","提示");
+		return;
+	}
+	CArray<int,int>	arrSel;
+	arrSel.SetSize(nMultiSel);
+	m_listUsedMember.GetSelItems(nMultiSel,arrSel.GetData());
+	int nIndex,i;
+	string	szInfo;
+	CString	 str;
+	int		nPos,nCh,nZone;	
+	for (i=0;i<nMultiSel;i++)
+	{
+		//一次删除一个，并写入内存
+		nIndex = arrSel.GetAt(i);
+		m_listUsedMember.GetText(nIndex,str);
+//		szInfo = mapUsedGrp[nIndex];
+		nPos = str.Find(':');
+		str = str.Left(nPos);
+		ConvertCString2String(str,szInfo);
+		map_it = find_if(mapUsedGrp.begin(),mapUsedGrp.end(),map_value_finder_string(szInfo));
+		if (map_it == mapUsedGrp.end())
+		{
+			MessageBox("所选信道出现未知错误，请查看原始数据","提示");
+			return;
+		}
+		int nCnt = mapUsedGrp.size();//列表总数
+		memset(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pGroupList[0x00+2+GRP_CONTACT_NUM+(m_nCurrentGrp-1)*GRP_LIST_STRUCT_LEN],
+			0x00,nCnt);
+		mapUsedGrp.erase(map_it);
+
+		//更新列表总数
+// 		SetScanChannelCount(SCAN_CHANNELNUM,m_CurrentList,nCnt);
+		int n=0;
+		for (map_it= mapUsedGrp.begin();map_it != mapUsedGrp.end();map_it++)
+		{
+			szInfo = map_it->second;
+			nCh = (int)map_it->first;
+// 			nCh = (int)(szInfo&0x00ff);
+// 			nZone = (int)(szInfo>>8);
+// 			SetScanChFlag(SCAN_CHANNELFLAG,nCh,m_CurrentList,n,true);
+// 			SetScanChFlag(SCAN_CHANNELFLAG,nZone,m_CurrentList,n,FALSE);
+			((CPCSWApp*)AfxGetApp())->SetGrplistContnum(GRP_CONTACT_NUM,m_nCurrentGrp,n+1,int(map_it->first));
+// 			nContnum = GetIDorNum(GRP_MEMBER_NUM,m_nCurrentGrp);
+			((CPCSWApp*)AfxGetApp())->SetGrplistInfo(GRP_MEMBER_NUM,m_nCurrentGrp,n+1);
+			n++;
+		}
+	}
+	LoadData();
 }
 
 void CPropPageGrp::OnEnKillfocusEditName()
@@ -313,6 +365,11 @@ void CPropPageGrp::OnEnKillfocusEditName()
 	// TODO: 在此添加控件通知处理程序代码
 	CString		str;
 	m_editName.GetWindowText(str);
+	if (str.IsEmpty())
+	{
+		AfxMessageBox("请输入名称，不可为空");
+		return;
+	}
 	CString		strGrp;//检验是否有重复名字
 	int		nGrplistCount = *(WORD*)((CPCSWApp*)AfxGetApp())->m_CommInfo.pGroupList;
 	nGrplistCount/= GRP_LIST_STRUCT_LEN;
@@ -320,14 +377,17 @@ void CPropPageGrp::OnEnKillfocusEditName()
 	for (i=0;i<nGrplistCount;i++)
 	{
 		strGrp = ((CPCSWApp*)AfxGetApp())->GetGrplistName(i+1,NAME_BYTE_LEN);
-		if (str.CompareNoCase(strGrp)!=0)//字符串一样
+		if((i+1)!=m_nCurrentGrp && !strGrp.IsEmpty())
 		{
-			MessageBox("该名称已存在，请重新输入","提示");
-			m_editName.SetFocus();
-			break;
+			if (str.Find(strGrp)!=-1)//字符串一样
+			{
+				AfxMessageBox("该名称已存在，请重新输入");
+				m_editName.SetFocus();
+				return;
+			}
 		}
 	}
-	if (i <nGrplistCount)//全部不一样,无重复名称
+// 	if (i <=nGrplistCount)//全部不一样,无重复名称
 	{
 		((CPCSWApp*)AfxGetApp())->SetGrplistName(GRP_NAME,m_nCurrentGrp,str,NAME_BYTE_LEN);
 	}

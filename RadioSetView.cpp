@@ -179,10 +179,14 @@ BEGIN_MESSAGE_MAP(CRadioSetView, CFormView)
 	ON_CBN_SELCHANGE(IDC_COMBO_BGLIGHT, OnSelchangeComboBkLight)
 	ON_CBN_SELCHANGE(IDC_COMBO_POWER_LVL, OnSelchangeComboPowerLvl)
 	ON_BN_CLICKED(IDC_CHECK_POWERSAVELVL, OnCheckPowerLvl)
+	ON_EN_KILLFOCUS(IDC_EDIT_ID, &CRadioSetView::OnEnKillfocusEditID)
+	ON_EN_KILLFOCUS(IDC_EDIT_ALARM_EMEID, &CRadioSetView::OnEnKillfocusEditAlarmID)
+	
 	//}}AFX_MSG_MAP
 	ON_CONTROL_RANGE(CBN_SELCHANGE,IDC_COMBO_TOT_1,IDC_COMBO_TOT_4,OnTotSelChange)
 	ON_CONTROL_RANGE(CBN_SELCHANGE,IDC_COMBO_EMER_1,IDC_COMBO_EMER_4,OnEmerSelChange)
 	ON_CBN_SELCHANGE(IDC_COMBO_ALARM_CHANNEL, &CRadioSetView::OnCbnSelchangeComboAlarmChannel)
+	ON_EN_KILLFOCUS(IDC_EDIT_ALARM_NAME, &CRadioSetView::OnEnKillfocusEditAlarmName)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -211,7 +215,7 @@ void	CRadioSetView::LoadData()
 	str = GetIDStr(0,SETTING_ALARM_EMEID);//(CPCSWDoc*)GetDocument())->GetAlarmID(SETTING_ALARM_EMEID);
 	m_editALARMID.SetWindowText(str);
 	str.Empty();
-	str = GetAlarmName(SETTING_ALARM_NAME,SETTING_DBDBDWORD_LEN);
+	str = GetAlarmName(SETTING_ALARM_NAME,SETTING_NAME_LEN);
 		//((CPCSWDoc*)GetDocument())->GetAlarmName(SETTING_ALARM_NAME,SETTING_DBDBDWORD_LEN);
 	m_editALARMName.SetWindowText(str);
 	str.Empty();
@@ -982,3 +986,27 @@ void CRadioSetView::OnCbnSelchangeComboAlarmChannel()
 		SetEmerSettingValues(SETTING_ALARM_CHANNEL+1,0xff);
 	}
 }
+void CRadioSetView::OnEnKillfocusEditID()
+{
+	CString str;
+	m_editID.GetWindowText(str);
+	AddStrTailZero(str,SETTING_DWORD_LEN*2-1);
+	byte*	bID = ConvertStrTo7ID(str,SETTING_DWORD_LEN*2-1);
+	memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioSetting[0x00+SETTING_MSID],bID,SETTING_DWORD_LEN);
+}
+void	CRadioSetView::OnEnKillfocusEditAlarmID()
+{
+	CString str;
+	m_editALARMID.GetWindowText(str);
+	AddStrTailZero(str,SETTING_DWORD_LEN*2-1);
+	byte*	bID = ConvertStrTo7ID(str,SETTING_DWORD_LEN*2-1);
+	memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pEmergencySetting[0x00+SETTING_ALARM_EMEID],bID,SETTING_DWORD_LEN);
+}
+
+void CRadioSetView::OnEnKillfocusEditAlarmName()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString		str;
+	m_editALARMName.GetWindowText(str);
+	((CPCSWApp*)AfxGetApp())->SetAlarmName(SETTING_ALARM_NAME,str,SETTING_NAME_LEN);
+ }

@@ -47,7 +47,20 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CPCSWApp construction
-
+CString		AddStringTailZero(CString&	str,int nDesiredLen)
+{
+	if(str.IsEmpty())
+		return str;
+	int len = str.GetLength();
+	if(len>nDesiredLen)
+		return str;
+	int i=0;
+	for (i=0;i<nDesiredLen-len;i++)
+	{
+		str.Insert(len+i,'0');
+	}
+	return str;
+}
 CString		ConvertStrintToStrhex(CString&	strInt)
 {
 	if(strInt.IsEmpty())
@@ -124,14 +137,44 @@ BYTE*	ConvertStrToIntArray(CString	str,int& nLen)//nLen»¹Í¬Ê±·µ»Ø×÷Îªµ÷ÓÃ·½µÄ³¤¶
 }
 BYTE*	ConvertStrTo7ID(CString str,int nLen)
 {
-	BYTE*	data = new BYTE[nLen];
-	ZeroMemory(data,nLen);
+	BYTE*	data ;
+	if(nLen%2==1)
+		data = new BYTE[nLen/2+1];
+	else
+		data = new BYTE[nLen/2];
+	ZeroMemory(data,sizeof(data));
 	if(str.IsEmpty())
 		return data;
 	int nPos = str.Find('.');
 	if(nPos>=0)
 		str.Delete(nPos);
+	str = str.Left(nLen);
+	char	ch;
+	int i;
+	for (i=nLen-1;i>=0;i--)
+	{
+		ch = str.GetAt(i);//from low addr to high addr
+		ch = ch-'0';
+		if(i%2 ==0)//even array 
+			data[(nLen-1-i)/2] = ch|data[(nLen-i-1)/2]&0xf0;
+		else
+			data[(nLen-1-i)/2] = (ch<<4)|(data[(nLen-1-i)/2]&0x0f);
+	}
+	data[(nLen-1)/2] = (data[(nLen-1)/2]&0x0f)|0xf0;
+
 	return data;
+}
+void	AddStrTailZero(CString&	str,int nDesiredLen)
+{
+	int len = str.GetLength();
+	if(len>nDesiredLen)
+		return;
+	int i=0;
+	for (i=0;i<nDesiredLen-len;i++)
+	{
+		str.Insert(len+i,'0');
+	}
+	return;
 }
 CPCSWApp::CPCSWApp()
 {
@@ -509,7 +552,19 @@ int  CPCSWApp::GetFreqBoundry(bool bMax /* = true */)
 	}
 	return nBoundry;
 }
+void	CPCSWApp::SetAlarmName(int nFlag,CString& str,int nLen)
+{
+	BYTE*	ptr = &m_CommInfo.pEmergencySetting[0x00+nFlag];
+	BYTE *szTemp  = new BYTE [nLen*2];
+	memset(szTemp,0x00,nLen*2);
+	memset(ptr,0x00,nLen);
+	int nLength = str.GetLength();
+	if(!str.IsEmpty())
+		MultiByteToWideChar(CP_ACP,0,str,nLength,(LPWSTR)szTemp,nLen);
+	memcpy(ptr,szTemp,nLen);
+	delete	szTemp;
 
+}
 /************************************************************************/
 /* scan É¨Ãè
 */
@@ -621,39 +676,41 @@ void	CPCSWApp::SetContName(int nFlag,int nGrp,CString& str,int nLen)
 	delete	szTemp;
 
 }
-//ÓÐÎÊÌâ
+//ÓÐÎÊÌâ¡ª¡ª²»ÔÚÊ¹ÓÃ
 void	CPCSWApp::SetContID(int nFlag,int nGrp,CString& str)
 {
 	int nTotalLen = 7;
 	int	nLessLen = 6;
 	char ch;
 	int i;
-	BYTE byData;
+	BYTE *byData;
 	CString strTemp = str;
-	int length=strTemp.GetLength();
-	if(length>nTotalLen)
-		length=nTotalLen;
-	else if(length<nTotalLen)
-	{
-		for(i=0;i<nTotalLen-length;i++)
-			strTemp.Insert(i,'0');
-	}
-
-	for(i=nLessLen;i>=0;i--)
-	{
-		ch=strTemp.GetAt(i);
-		if((ch>='0') && (ch<='9'))
-			byData=ch-'0';
-		else
-			break;
-		if(i%2==0)
-			*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+(nLessLen-i)/2) = 
-			(*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+(nLessLen-i)/2)&0x0F) | byData;
-		else
-			*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+(nLessLen-i)/2) = 
-			(*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+(nLessLen-i)/2)&0xF0) | (byData<<4);
-	}
-	*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+3)|=0x0F;
+	byData = ConvertStrTo7ID(strTemp,7);
+	
+// 	int length=strTemp.GetLength();
+// 	if(length>nTotalLen)
+// 		length=nTotalLen;
+// 	else if(length<nTotalLen)
+// 	{
+// 		for(i=0;i<nTotalLen-length;i++)
+// 			strTemp.Insert(i,'0');
+// 	}
+// 
+// 	for(i=nLessLen;i>=0;i--)
+// 	{
+// 		ch=strTemp.GetAt(i);
+// 		if((ch>='0') && (ch<='9'))
+// 			byData=ch-'0';
+// 		else
+// 			break;
+// 		if(i%2==0)
+// 			*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+(nLessLen-i)/2) = 
+// 			(*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+(nLessLen-i)/2)&0x0F) | byData;
+// 		else
+// 			*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+(nLessLen-i)/2) = 
+// 			(*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+(nLessLen-i)/2)&0xF0) | (byData<<4);
+// 	}
+// 	*(m_CommInfo.pContactInfo+2+nFlag+(nGrp-1)*22+3)|=0x0F;
 }
 void	CPCSWApp::SetContCount(int nVal)
 {
@@ -690,7 +747,7 @@ int		CPCSWApp::GetGrplistInfo(int nFlag,int nGrp,int nLen)
 }
 void	CPCSWApp::SetGrplistName(int nFlag,int nGrp,CString& str,int nLen)
 {
-	BYTE*	ptr = &m_CommInfo.pGroupList[0x00+2+nFlag+(nGrp-1)*22];
+	BYTE*	ptr = &m_CommInfo.pGroupList[0x00+2+nFlag+(nGrp-1)*GRP_LIST_STRUCT_LEN];
 	BYTE *szTemp  = new BYTE [nLen*2];
 	memset(szTemp,0x00,nLen*2);
 	memset(ptr,0x00,nLen);
