@@ -18,6 +18,7 @@
 typedef	struct	_tagCOMM_EVENT
 {
 	CWnd*	pMainframe;
+	HWND	hWnd;
 	CSerial*	pSerial;
 	CString		strSetting;
 	unsigned	char*	pRadioInfo;//序列，机型，版本，频率==16+8+2+4+4+4==38==>界面版本
@@ -70,6 +71,9 @@ typedef	struct	_tagCOMM_EVENT
 // 	unsigned	char	pShortText[0x2000];//快捷文本内容
 // }CommInfo,*pCommInfo;
 
+
+#define		WM_UPDATE		WM_USER+101
+
 class CMainFrame : public CMDIFrameWnd
 {
 	DECLARE_DYNAMIC(CMainFrame)
@@ -84,12 +88,13 @@ protected:
 public:
 // 	CommInfo	m_CommInfo;
 
-    mybar m_CtrlBar;
 	int		m_nPaud;//波特率
 	int		m_nComm;
+	int		m_nViewIndex;
 	bool	m_bReadyComm;// 串口是否正确选择
 	CSerial	m_SerialPort;//串口
 	CWinThread*	m_pThread;
+	mybar m_CtrlBar;
 
 
 // Operations
@@ -114,12 +119,11 @@ public:
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
-	afx_msg LRESULT ShowChildWindow(WPARAM wParam,LPARAM lParam);
 	CSplitterWnd	m_wndSplit;
-	CToolBar    m_wndToolBar;
 
 protected:  // control bar embedded members
 	CStatusBar  m_wndStatusBar;
+	CToolBar    m_wndToolBar;
 
 //	CSplitterWndEx	m_wndSplit;
 // Generated message map functions
@@ -132,8 +136,11 @@ protected:
 	afx_msg void OnWriteParameter();
 	afx_msg void OnUpdateWriteParameter(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateFileSave(CCmdUI* pCmdUI);
+	afx_msg	LRESULT	OnUpdateViews(WPARAM wparam,LPARAM lparam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg LRESULT ShowChildWindow(WPARAM wParam,LPARAM lParam);
 };
 
 /////////////////////////////////////////////////////////////////////////////

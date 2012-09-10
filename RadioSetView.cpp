@@ -505,6 +505,7 @@ void	CRadioSetView::LoadComboString()
 	m_cbNoiseLvl.ResetContent();
 	m_cbAlarmMode.ResetContent();
 	m_cbAlarmType.ResetContent();
+	((CComboBox*)GetDlgItem(IDC_COMBO_MAINFRAME_STYLE))->ResetContent();
 	for(i=0;i<sizeof(strIdleDisp)/sizeof(strIdleDisp[0]);i++)
 	{	
 		((CComboBox*)GetDlgItem(IDC_COMBO_MAINFRAME_STYLE))->AddString(strIdleDisp[i]);

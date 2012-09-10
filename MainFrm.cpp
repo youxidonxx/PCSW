@@ -59,6 +59,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_WRITE_PARAMETER, OnUpdateWriteParameter)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE, OnUpdateFileSave)
 	ON_MESSAGE(WM_SHOW_WINDOW,ShowChildWindow)
+	ON_MESSAGE(WM_UPDATE,OnUpdateViews)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -79,6 +80,7 @@ CMainFrame::CMainFrame()
 	m_nComm = 0;
 	m_nPaud = 0;
 	m_nPaud = 115200;
+	m_nViewIndex = 1;
 	m_bReadyComm = false;
 // 	m_CommInfo.bHasInfo = false;
 }
@@ -236,13 +238,98 @@ void	CMainFrame::TransferCommData()
 	memcpy(&theApp.m_CommInfo.pShortText,iCommEvent.pShortText,sizeof(theApp.m_CommInfo.pShortText));
 
 // 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+// 	((CPCSWApp*)AfxGetApp())->UpdateActiveView();
+}
+LRESULT	CMainFrame::OnUpdateViews(WPARAM wparam,LPARAM lparam)
+{
 	((CPCSWApp*)AfxGetApp())->UpdateActiveView();
-// 	UINT	style = pFrame->m_wndToolBar.GetButtonStyle(4);
-// 	CFormView*	pView = (CFormView*)(m_wndSplit.GetPane(0,1));
-// 	pView->UpdateWindow();
-// 	CWnd*	pView = (CWnd*)pFrame->m_wndSplit.GetPane(0,1);
-// 	MDIActivate(pView);
- }
+	CView*	pView = (CView*)m_wndSplit.GetPane(0,1);
+	CRect	rectView,rectFrm;
+	pView->GetClientRect(&rectView);
+	GetClientRect(&rectFrm);
+	int nIndex = m_nViewIndex;
+	switch(nIndex)
+	{
+	case 1:
+		{
+			if (pView->IsKindOf(RUNTIME_CLASS(CPCSWView)))
+			{
+				m_wndSplit.DeleteView(0,1);
+				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CPCSWView),CSize(rectView.Width(),rectView.Height()),NULL);
+				m_wndSplit.RecalcLayout();
+				// 				(CPCSWView)pView->LoadData();
+			}
+		}
+		break;
+	case 2:
+		{
+			if (pView->IsKindOf(RUNTIME_CLASS(CMenuKeyView)))
+			{
+				m_wndSplit.DeleteView(0,1);
+				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CMenuKeyView),CSize(rectView.Width(),rectView.Height()),NULL);
+				m_wndSplit.RecalcLayout();
+				// 				(CMenuKeyView*)pView->LoadData();
+			}
+		}
+		break;
+	case 3:
+		{
+			if (pView->IsKindOf(RUNTIME_CLASS(CRadioSetView)))
+			{
+				m_wndSplit.DeleteView(0,1);
+				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CRadioSetView),CSize(rectView.Width(),rectView.Height()),NULL);
+				m_wndSplit.RecalcLayout();
+				// 				(CRadioSetView*)pView->LoadData();
+			}
+		}
+		break;
+	case 4:
+		{
+			if (pView->IsKindOf(RUNTIME_CLASS(CScanView)))
+			{
+				m_wndSplit.DeleteView(0,1);
+				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CScanView),CSize(rectView.Width(),rectView.Height()),NULL);
+				m_wndSplit.RecalcLayout();
+				// 				(CScanView*)pView->LoadData();
+			}
+		}
+		break;
+	case 5:
+		{
+			if (pView->IsKindOf(RUNTIME_CLASS(CZoneInfo)))
+			{
+				m_wndSplit.DeleteView(0,1);
+				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CZoneInfo),CSize(rectView.Width(),rectView.Height()),NULL);
+				m_wndSplit.RecalcLayout();
+				// 				(CZoneInfo*)pView->LoadData();
+			}
+		}
+		break;
+	case 6:
+		{
+			if (pView->IsKindOf(RUNTIME_CLASS(CDpmrView)))
+			{
+				m_wndSplit.DeleteView(0,1);
+				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CDpmrView),CSize(rectView.Width(),rectView.Height()),NULL);
+				m_wndSplit.RecalcLayout();
+				// 				(CDpmrView*)pView->LoadData();
+			}
+		}
+		break;
+	default:
+		{
+			if (!pView->IsKindOf(RUNTIME_CLASS(CPCSWView)))
+			{
+				m_wndSplit.DeleteView(0,1);
+				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CRadioSetView),CSize(rectView.Width(),rectView.Height()),NULL);
+				m_wndSplit.RecalcLayout();
+				// 				(CPCSWView*)pView->LoadData();
+			}
+		}
+		break;
+	}
+	return true;
+}
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
@@ -405,6 +492,7 @@ void CMainFrame::OnReadParameter()
  	iCommEvent.pMainframe =  (CMainFrame*)AfxGetMainWnd();
 	iCommEvent.bRead = TRUE;
 	iCommEvent.pSerial = &m_SerialPort;
+	iCommEvent.hWnd = m_hWnd;
 
 	iCommEvent.pRadioInfo = theApp.m_CommInfo.pRadioInfo;
 		//GetDocument()->pRadioInfo;
@@ -445,6 +533,7 @@ void CMainFrame::OnReadParameter()
 UINT	ThraedComm(LPVOID lpParam)
 {
 	COMM_EVENT*	pEvent = (COMM_EVENT*)lpParam;
+	CWaitCursor	wc;
 
 	int	i,len = 22;
 	BYTE	szBuff[0x2000];
@@ -489,6 +578,9 @@ UINT	ThraedComm(LPVOID lpParam)
 			{
 				pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
 				AfxMessageBox("连接失败");
+				
+				wc.Restore();
+
 				return 0;
 			}
 		}//end for k<3
@@ -519,6 +611,7 @@ UINT	ThraedComm(LPVOID lpParam)
 					if (memcmp(szBuff+18,code,4)<0)
 					{
 						AfxMessageBox("密码错误");
+						wc.Restore();
 						return 0;
 					}
 				}
@@ -529,7 +622,10 @@ UINT	ThraedComm(LPVOID lpParam)
 				return 0;
 			}
 			if(pEvent->bCancel)
+			{
+				wc.Restore();
 				return 0;
+			}
 
 			byte	szPwd[6];
 			memcpy(szPwd,szBuff+18,4);
@@ -578,6 +674,7 @@ UINT	ThraedComm(LPVOID lpParam)
 						else
 						{
 							pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
+							wc.Restore();
 							return 0;
 						}
 					}
@@ -596,6 +693,7 @@ UINT	ThraedComm(LPVOID lpParam)
 						else
 						{
 							pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
+							wc.Restore();
 							return 0;
 						}
 					}//end case
@@ -629,6 +727,7 @@ UINT	ThraedComm(LPVOID lpParam)
 						else
 						{
 							pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
+							wc.Restore();
 							return 0;
 						}
 
@@ -748,11 +847,15 @@ UINT	ThraedComm(LPVOID lpParam)
 		{
 			return 0;
 		}
-	AfxMessageBox("操作完成");
+		wc.Restore();
+ 	AfxMessageBox("操作完成");
+
 	if (pEvent->bRead)
 	{
-			((CMainFrame*)pEvent->pMainframe)->UpdateAllViews(1);
+// 			((CMainFrame*)pEvent->pMainframe)->UpdateAllViews(1);
 			((CMainFrame*)pEvent->pMainframe)->TransferCommData();
+			SendMessage(pEvent->hWnd,WM_UPDATE,0,0);
+// 			((CMainFrame*)pEvent->hWnd)->TransferCommData();
 //			CView*	pView = (CView*)((CMainFrame*)pEvent->pMainframe)->m_wndSplit.GetPane(0,1);
 /*			POSITION	pos;
 			CPCSWDoc*	pDoc = (CFrameWnd*)GetDocument();
@@ -1226,7 +1329,7 @@ void	CMainFrame::SwitchView(int nIndex)
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CPCSWView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-
+				m_nViewIndex = 1;
 			}
 		}
 		break;
@@ -1237,7 +1340,7 @@ void	CMainFrame::SwitchView(int nIndex)
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CMenuKeyView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-				
+				m_nViewIndex = 2;
 			}
 		}
 		break;
@@ -1248,7 +1351,7 @@ void	CMainFrame::SwitchView(int nIndex)
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CRadioSetView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-
+				m_nViewIndex = 3;
 			}
 		}
 		break;
@@ -1259,7 +1362,7 @@ void	CMainFrame::SwitchView(int nIndex)
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CScanView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-
+				m_nViewIndex = 4;
 			}
 		}
 		break;
@@ -1270,7 +1373,7 @@ void	CMainFrame::SwitchView(int nIndex)
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CZoneInfo),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-
+				m_nViewIndex = 5;
 			}
 		}
 		break;
@@ -1281,7 +1384,7 @@ void	CMainFrame::SwitchView(int nIndex)
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CDpmrView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-
+				m_nViewIndex = 6;
 			}
 		}
 		break;

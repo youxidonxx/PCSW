@@ -414,19 +414,6 @@ void CPCSWApp::OnFileOpen()
 		ce.ReportError();
 		return;
 	}
-// 	CMainFrame*	pFrame = (CMainFrame*)m_pMainWnd;
-//   	file.Read(pFrame->m_CommInfo.pHead,sizeof(pFrame->m_CommInfo.pHead));
-// 	file.Read(pFrame->m_CommInfo.pRadioInfo,sizeof(pFrame->m_CommInfo.pRadioInfo));
-// 	file.Read(pFrame->m_CommInfo.pRadioSetting,sizeof(pFrame->m_CommInfo.pRadioSetting));
-// 	file.Read(pFrame->m_CommInfo.pEmergencySetting,sizeof(pFrame->m_CommInfo.pEmergencySetting));
-// 	file.Read(pFrame->m_CommInfo.pMenuSetting,sizeof(pFrame->m_CommInfo.pMenuSetting));
-// 	file.Read(pFrame->m_CommInfo.pKeyFunctionSetting,sizeof(pFrame->m_CommInfo.pKeyFunctionSetting));
-// 	file.Read(pFrame->m_CommInfo.pZoneInfo,sizeof(pFrame->m_CommInfo.pZoneInfo));
-// 	file.Read(pFrame->m_CommInfo.pChannelInfo,sizeof(pFrame->m_CommInfo.pChannelInfo));
-// 	file.Read(pFrame->m_CommInfo.pScanInfo,sizeof(pFrame->m_CommInfo.pScanInfo));
-// 	file.Read(pFrame->m_CommInfo.pContactInfo,sizeof(pFrame->m_CommInfo.pContactInfo));
-// 	file.Read(pFrame->m_CommInfo.pGroupList,sizeof(pFrame->m_CommInfo.pGroupList));
-// 	file.Read(pFrame->m_CommInfo.pShortText,sizeof(pFrame->m_CommInfo.pShortText));
 
 	m_CommInfo.bHasInfo = true;
 	file.Read(m_CommInfo.pHead,sizeof(m_CommInfo.pHead));
@@ -453,8 +440,8 @@ void CPCSWApp::OnFileOpen()
 }
 void	CPCSWApp::UpdateActiveView()
 {
-	CMainFrame*	pFrame = (CMainFrame*)AfxGetMainWnd();
-//	CView*	pView = (CView*)pFrame->m_wndSplit.GetPane(0,1);
+	CMainFrame*	pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+// 	}
 }
 void	CPCSWApp::OnFileSave()
 {
