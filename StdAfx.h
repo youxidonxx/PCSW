@@ -22,6 +22,7 @@
 #define		SHORTTEXT_STRUCT_LEN		162
 #define		ZONE_STRUCT_LEN			736
 #define		CHANNEL_STRUCT_LEN		46
+#define		SCAN_STRUCT_LEN			60
 
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions

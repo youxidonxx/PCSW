@@ -89,6 +89,32 @@ void	CPropPageGrp::LoadData()
 	m_editName.SetWindowText(strName);
 	SetStaticName();
 	ListDataShow(nGrpID,nGrpCnt);
+	EnableButtons();
+}
+void	CPropPageGrp::EnableButtons()
+{
+	if(m_nCurrentGrp == m_nGrp)
+	{
+		((CButton*)GetDlgItem(IDC_BUTTON_FIRST))->EnableWindow(TRUE);
+		((CButton*)GetDlgItem(IDC_BUTTON_PREV))->EnableWindow(TRUE);
+		((CButton*)GetDlgItem(IDC_BUTTON_NEXT))->EnableWindow(FALSE);
+		((CButton*)GetDlgItem(IDC_BUTTON_LAST))->EnableWindow(FALSE);
+	}
+	else if (m_nCurrentGrp == 1)
+	{
+		((CButton*)GetDlgItem(IDC_BUTTON_FIRST))->EnableWindow(FALSE);
+		((CButton*)GetDlgItem(IDC_BUTTON_PREV))->EnableWindow(FALSE);
+		((CButton*)GetDlgItem(IDC_BUTTON_NEXT))->EnableWindow(TRUE);
+		((CButton*)GetDlgItem(IDC_BUTTON_LAST))->EnableWindow(TRUE);	
+	}
+	else
+	{
+		((CButton*)GetDlgItem(IDC_BUTTON_FIRST))->EnableWindow(TRUE);
+		((CButton*)GetDlgItem(IDC_BUTTON_PREV))->EnableWindow(TRUE);
+		((CButton*)GetDlgItem(IDC_BUTTON_NEXT))->EnableWindow(TRUE);
+		((CButton*)GetDlgItem(IDC_BUTTON_LAST))->EnableWindow(TRUE);	
+	}
+
 }
 void	CPropPageGrp::SetStaticName()
 {
@@ -319,7 +345,7 @@ void CPropPageGrp::OnBnClickedButtonDelete()
 	int nIndex,i;
 	string	szInfo;
 	CString	 str;
-	int		nPos,nCh,nZone;	
+	int		nPos,nCh;	
 	for (i=0;i<nMultiSel;i++)
 	{
 		//一次删除一个，并写入内存

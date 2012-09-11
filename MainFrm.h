@@ -92,6 +92,7 @@ public:
 	int		m_nComm;
 	int		m_nViewIndex;
 	bool	m_bReadyComm;// 串口是否正确选择
+	bool	m_bBusy;	//是否在读写频操作
 	CSerial	m_SerialPort;//串口
 	CWinThread*	m_pThread;
 	mybar m_CtrlBar;
@@ -120,6 +121,7 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 	CSplitterWnd	m_wndSplit;
+	void	RecoveredInfoLen();
 
 protected:  // control bar embedded members
 	CStatusBar  m_wndStatusBar;
@@ -137,6 +139,7 @@ protected:
 	afx_msg void OnUpdateWriteParameter(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateFileSave(CCmdUI* pCmdUI);
 	afx_msg	LRESULT	OnUpdateViews(WPARAM wparam,LPARAM lparam);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:

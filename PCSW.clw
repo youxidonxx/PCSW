@@ -2,7 +2,7 @@
 
 [General Info]
 Version=1
-LastClass=CZoneInfo
+LastClass=CMainFrame
 LastTemplate=CFormView
 NewFileInclude1=#include "stdafx.h"
 NewFileInclude2=#include "PCSW.h"
@@ -15,35 +15,35 @@ Class3=CPCSWView
 Class4=CMainFrame
 
 ResourceCount=16
-Resource1=IDD_PROPPAGE_SMS
-Resource2=IDD_SCAN_FORM
-Resource3=IDD_SETTING_FORM
+Resource1=IDD_DPMR_FORM
+Resource2=IDD_DIALOG_COMSET
+Resource3=IDR_PCSWTYPE
 Class5=CChildFrame
 Class6=CAboutDlg
-Resource4=IDD_DIALOG_COMSET
+Resource4=IDD_MENUKEY_FORM
 Class7=CCOMSET
-Resource5=IDD_MENUKEY_FORM
-Resource6=IDD_PCSW_FORM
+Resource5=IDD_PROPPAGE_VIEW
+Resource6=IDD_PROPPAGE_SMS
 Class8=CMenuSet
 Class9=CRadioSetView
-Resource7=IDD_PROPPAGE_CONTACT
+Resource7=IDD_PCSW_FORM
 Class10=CZoneInfo
-Resource8=IDR_PCSWTYPE
-Resource9=IDR_MAINFRAME
+Resource8=IDD_PROPPAGE_CONTACT
+Resource9=IDD_ZONE_FORM
 Class11=CScanView
-Resource10=IDD_PROPPAGE_GROUPLIST
-Resource11=IDD_PROPPAGE_VIEW
+Resource10=IDD_SCAN_FORM
+Resource11=IDD_MENU_FORM
 Class12=CMyPropSheet
-Resource12=IDD_ABOUTBOX
-Resource13=IDD_DPMR_FORM
+Resource12=IDD_PROPPAGE_GROUPLIST
+Resource13=IDD_SETTING_FORM
 Class13=CPropPageSMS
 Class14=CPropPageContact
 Class15=CDpmrView
 Class16=CPropPageGrp
 Class17=CMyTree
-Resource14=IDD_ZONE_FORM
+Resource14=IDR_MAINFRAME
 Class18=CMenuKeyView
-Resource15=IDD_MENU_FORM
+Resource15=IDD_ABOUTBOX
 Class19=CGridView
 Resource16=IDD_GRID_VIEW (English (U.S.))
 
@@ -378,7 +378,7 @@ VirtualFilter=VWC
 [DLG:IDD_ZONE_FORM]
 Type=1
 Class=CZoneInfo
-ControlCount=15
+ControlCount=20
 Control1=IDC_GRID_ZONEINFO,MFCGridCtrl,1216413696
 Control2=IDC_EDIT_ZONE,edit,1216413824
 Control3=IDC_COMBO_ZONE,combobox,1075904579
@@ -394,6 +394,11 @@ Control12=IDC_COMBO_ZONELIST,combobox,1210122242
 Control13=IDC_GRID_ZONE,MFCGridCtrl,1350631424
 Control14=IDC_EDIT_ZONENAME,edit,1350631552
 Control15=IDC_STATIC,static,1342308352
+Control16=IDC_STATIC,static,1342308352
+Control17=IDC_STATIC,static,1342308352
+Control18=IDC_STATIC,static,1342308352
+Control19=IDC_STATIC,static,1342308352
+Control20=IDC_STATIC,static,1342308352
 
 [CLS:CZoneInfo]
 Type=0

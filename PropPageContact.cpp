@@ -260,7 +260,7 @@ void CPropPageContact::OnBnClickedButtonContDel()
  		//m_gridCtrl.GetFocusCell().row;
 	if (cell.row>0 && cell.row <=m_gridCtrl.GetRowCount())
 	{
-		int nCurrent,nLeft;
+		int nCurrent;
 		nCurrent = cell.row;
 		while (nCurrent<=m_Cnt)
 		{
@@ -331,5 +331,5 @@ void CPropPageContact::OnEnKillfocusEditContent()
 
 	}
 	m_editContent.HideWindow();
-	LoadData();
+ 	LoadData();
 }

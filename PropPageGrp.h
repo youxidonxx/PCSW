@@ -73,6 +73,7 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CPropPageGrp)
 	virtual BOOL OnInitDialog();
+	void	EnableButtons();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

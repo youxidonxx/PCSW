@@ -1072,7 +1072,7 @@ void CZoneInfo::OnButtonAdd()
 		m_nZonenum++;
 		m_nCurrentZone = m_nZonenum;
 		//写入数值,并将数据后移
-		int i,nChanCnt = 16;//区域支持信道数
+		int nChanCnt = 16;//区域支持信道数
 		SetInfo(m_nCurrentZone,0,ZONE_CHANNEL_NUM,nChanCnt,18,0,false);
 // 		//从后往前开始后移
 // 		for(i=0;i<m_nZonenum-m_nCurrentZone;i++)
@@ -1331,7 +1331,12 @@ CString	CZoneInfo::GetByteInfo(int nTmp,int nAddr)
 			if(nTmp >=0 && nTmp<=32 )
 			{
 				LoadGrplist();
-				m_GridComboZone.GetLBText(nTmp,str);
+				if (m_GridComboZone.GetCount()>1)
+ 				{
+					m_GridComboZone.GetLBText(nTmp,str);
+				}
+				else
+					m_GridComboZone.GetLBText(-1,str);
 			}	
 			else
 				 str.Format("取值错误:%d",nTmp);
@@ -1342,7 +1347,12 @@ CString	CZoneInfo::GetByteInfo(int nTmp,int nAddr)
 			if(nTmp >=0 && nTmp<=200 )
 			{
 				LoadContactlist();
-				m_GridComboZone.GetLBText(nTmp,str);
+				if(m_GridComboZone.GetCount()>1)
+				{
+					m_GridComboZone.GetLBText(nTmp,str);
+				}
+				else
+					m_GridComboZone.GetLBText(-1,str);
 			}
 			else
 				 str.Format("取值错误:%d",nTmp);

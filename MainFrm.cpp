@@ -58,8 +58,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	ON_COMMAND(ID_WRITE_PARAMETER, OnWriteParameter)
 	ON_UPDATE_COMMAND_UI(ID_WRITE_PARAMETER, OnUpdateWriteParameter)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE, OnUpdateFileSave)
-	ON_MESSAGE(WM_SHOW_WINDOW,ShowChildWindow)
 	ON_MESSAGE(WM_UPDATE,OnUpdateViews)
+	ON_MESSAGE(WM_SHOW_WINDOW,ShowChildWindow)
+	ON_WM_SETCURSOR()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -82,6 +83,7 @@ CMainFrame::CMainFrame()
 	m_nPaud = 115200;
 	m_nViewIndex = 1;
 	m_bReadyComm = false;
+	m_bBusy = false;
 // 	m_CommInfo.bHasInfo = false;
 }
 
@@ -237,6 +239,30 @@ void	CMainFrame::TransferCommData()
 	memcpy(&theApp.m_CommInfo.pGroupList,iCommEvent.pGroupList,sizeof(theApp.m_CommInfo.pGroupList));
 	memcpy(&theApp.m_CommInfo.pShortText,iCommEvent.pShortText,sizeof(theApp.m_CommInfo.pShortText));
 
+	m_bBusy = false;
+	if (!iCommEvent.bRead)
+	{
+		WORD nlen;
+		nlen = *(WORD*)theApp.m_CommInfo.pScanInfo;
+// 		 	nlen = nlen*SCAN_STRUCT_LEN;
+		theApp.m_CommInfo.pScanInfo[0x00] = (nlen&0x00ff);
+		theApp.m_CommInfo.pScanInfo[0x01] = (nlen&0xff00)>>8;
+
+		nlen = *(WORD*)theApp.m_CommInfo.pContactInfo;
+		nlen = nlen*CONTACT_STRUCT_LEN;
+		theApp.m_CommInfo.pContactInfo[0x00] = (nlen&0x00ff);
+		theApp.m_CommInfo.pContactInfo[0x01] = (nlen&0xff00)>>8;
+
+		nlen = *(WORD*)theApp.m_CommInfo.pGroupList;
+		nlen = nlen*GRP_LIST_STRUCT_LEN;
+		theApp.m_CommInfo.pGroupList[0x00] = (nlen&0x00ff);
+		theApp.m_CommInfo.pGroupList[0x01] = (nlen&0xff00)>>8;
+
+		nlen = *(WORD*)theApp.m_CommInfo.pShortText;
+		nlen = nlen*SHORTTEXT_STRUCT_LEN;
+		theApp.m_CommInfo.pShortText[0x00] = (nlen&0x00ff);
+		theApp.m_CommInfo.pShortText[0x01] = (nlen&0xff00)>>8;
+	}
 // 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
 // 	((CPCSWApp*)AfxGetApp())->UpdateActiveView();
 }
@@ -528,12 +554,14 @@ void CMainFrame::OnReadParameter()
 	memcpy(iCommEvent.szPara+4,effectreq,sizeof(SpPcEffect_S));
 
 	m_pThread = AfxBeginThread(ThraedComm,&iCommEvent);
+	m_bBusy = true;
 
 }
 UINT	ThraedComm(LPVOID lpParam)
 {
 	COMM_EVENT*	pEvent = (COMM_EVENT*)lpParam;
-	CWaitCursor	wc;
+ 
+	SendMessage(pEvent->hWnd,WM_SETCURSOR,(WPARAM)1,0);
 
 	int	i,len = 22;
 	BYTE	szBuff[0x2000];
@@ -544,46 +572,52 @@ UINT	ThraedComm(LPVOID lpParam)
 		pEvent->pSerial->OpenComm(pEvent->pSerial->m_nPort,pEvent->pSerial->m_nPaud);
 	}
 	Sleep(100);
-//	for (i=1;i<300;i++)
+ 	for (i=1;i<10;i++)
 	{
 		//发送3次请求并检测传输数据，只要有一次建立即可继续运行
-		for (int k=0;k<3;k++)
+		if(pEvent->pSerial->IsOpen())
 		{
-			//打开串口之后，一直等待串口数据传出来，有数据之后，才继续往下运行
-// 			while(pEvent->pSerial->ReadCommData(0)>=0);
- 				
-			//小端模式，无法直接赋值，需要对数值改形式
-			//建立连接请求
-			//5F 5F 10 00 00 03 00 2B 02 00 8F 11 04 00 26 09 26 09 FF FF 55 AA==22byte
-			szBuff[0] = szBuff[1] = 0x5f;
-			szBuff[2] = 0x10;szBuff[3] = 0x00;
-			szBuff[20] = 0x55; szBuff[21] = 0xaa;
-			memcpy(szBuff+4,connectreq,sizeof(SpPcConnect_S));
-			int returnNum = pEvent->pSerial->WriteCommData(szBuff,22,1,0);
+			for (int k=0;k<3;k++)
+			{
+// 				while(pEvent->pSerial->ReadCommData(0)!=-1);
+				//打开串口之后，一直等待串口数据传出来，有数据之后，才继续往下运行
+				// 			while(pEvent->pSerial->ReadCommData(0)>=0);
 
-			//接收下位机数据，应该为建立连接响应SpConnectCnF
-			//当结构变化后，灵活转换
-			if (len!= sizeof(SpPcConCnf_S)+6)
-			{
-				 len = sizeof(SpPcConCnf_S)+6;
-			}
-			//返回的数据
-			//5F 5F 10 00 00 2B 00 03 02 00 90 11 04 00 01 00 00 00 FF FF 55 AA
-			nRcvChar = pEvent->pSerial->ReadCommData(szBuff,len,500);
-			SpPcConCnf_S*	spReadCnf = (SpPcConCnf_S*)(szBuff+4);
-			//判断返回值是否连接成功
-			if((nRcvChar == 22)&&(spReadCnf->ready == 0x01))
-				break;
-			if (pEvent->bCancel)
-			{
-				pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
-				AfxMessageBox("连接失败");
+				//小端模式，无法直接赋值，需要对数值改形式
+				//建立连接请求
+				//5F 5F 10 00 00 03 00 2B 02 00 8F 11 04 00 26 09 26 09 FF FF 55 AA==22byte
+				szBuff[0] = szBuff[1] = 0x5f;
+				szBuff[2] = 0x10;szBuff[3] = 0x00;
+				szBuff[20] = 0x55; szBuff[21] = 0xaa;
+				memcpy(szBuff+4,connectreq,sizeof(SpPcConnect_S));
+				int returnNum = pEvent->pSerial->WriteCommData(szBuff,22,10,0);
 				
-				wc.Restore();
-
-				return 0;
-			}
-		}//end for k<3
+				//接收下位机数据，应该为建立连接响应SpConnectCnF
+				//当结构变化后，灵活转换
+				if (len!= sizeof(SpPcConCnf_S)+6)
+				{
+					len = sizeof(SpPcConCnf_S)+6;
+				}
+				Sleep(100);
+				//返回的数据
+				//5F 5F 10 00 00 2B 00 03 02 00 90 11 04 00 01 00 00 00 FF FF 55 AA
+				nRcvChar = pEvent->pSerial->ReadCommData(szBuff,len,500);
+				SpPcConCnf_S*	spReadCnf = (SpPcConCnf_S*)(szBuff+4);
+				//判断返回值是否连接成功
+				if((nRcvChar == 22)&&(spReadCnf->ready == 0x01))
+					break;
+				if (pEvent->bCancel)
+				{
+					pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
+					AfxMessageBox("连接失败");
+					return 0;
+				}
+			}//end for k<3
+		}
+		if((nRcvChar==22) && (szBuff[14]==0x01))
+			break;
+		//若通信不成功，则关闭串口
+		pEvent->pSerial->CloseComm();
 	}//end for i==300	
 		if (pEvent->bRead)
 		{//读频处理
@@ -611,8 +645,7 @@ UINT	ThraedComm(LPVOID lpParam)
 					if (memcmp(szBuff+18,code,4)<0)
 					{
 						AfxMessageBox("密码错误");
-						wc.Restore();
-						return 0;
+ 						return 0;
 					}
 				}
 			}
@@ -623,8 +656,7 @@ UINT	ThraedComm(LPVOID lpParam)
 			}
 			if(pEvent->bCancel)
 			{
-				wc.Restore();
-				return 0;
+ 				return 0;
 			}
 
 			byte	szPwd[6];
@@ -674,8 +706,7 @@ UINT	ThraedComm(LPVOID lpParam)
 						else
 						{
 							pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
-							wc.Restore();
-							return 0;
+ 							return 0;
 						}
 					}
 					break;
@@ -693,8 +724,7 @@ UINT	ThraedComm(LPVOID lpParam)
 						else
 						{
 							pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
-							wc.Restore();
-							return 0;
+ 							return 0;
 						}
 					}//end case
 					break;
@@ -727,8 +757,7 @@ UINT	ThraedComm(LPVOID lpParam)
 						else
 						{
 							pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
-							wc.Restore();
-							return 0;
+ 							return 0;
 						}
 
 					}
@@ -802,12 +831,12 @@ UINT	ThraedComm(LPVOID lpParam)
 						int nZoneNum ; 
 						//先读取前20字节数据
 						pEvent->pSerial->ReadCommData(szBuff,20,50);
-						nZoneNum = szBuff[18];//获取有效的组呼列表
+						nZoneNum = szBuff[18];//获取有效的短信列表
 						int nTotal = 162*nZoneNum;//有效对应的字节数，contact
 						pEvent->pShortText[0x00] = (WORD)nTotal;
 						pEvent->pShortText[0x01] = (WORD)nTotal>>8;
 
-						nRcvChar = pEvent->pSerial->ReadCommData(szBuff+20,nTotal+4,500);
+						nRcvChar = pEvent->pSerial->ReadCommData(szBuff+20,nTotal+4,1500);
 						if ((nRcvChar == nTotal+4)&&(szBuff[14]==0x01))
 						{
 							memcpy(pEvent->pShortText+0x02,szBuff+20,nTotal);
@@ -826,13 +855,13 @@ UINT	ThraedComm(LPVOID lpParam)
 
 
 			}//end for i<22
-			AfxMessageBox("读取完毕");
+//			AfxMessageBox("读取完毕");
 //			return 1;
 		}//end bRead
  		else//进行写频
 		{
  			WriteParameter(szBuff,pEvent);
-			AfxMessageBox("写频完毕");
+// 			AfxMessageBox("写频完毕");
 		}
 		if (!pEvent->bRead)
 		{
@@ -847,14 +876,15 @@ UINT	ThraedComm(LPVOID lpParam)
 		{
 			return 0;
 		}
-		wc.Restore();
- 	AfxMessageBox("操作完成");
+		SendMessage(pEvent->hWnd,WM_SETCURSOR,(WPARAM)0,0);
+		AfxMessageBox("操作完成");
 
+		((CMainFrame*)pEvent->pMainframe)->TransferCommData();
 	if (pEvent->bRead)
 	{
 // 			((CMainFrame*)pEvent->pMainframe)->UpdateAllViews(1);
-			((CMainFrame*)pEvent->pMainframe)->TransferCommData();
 			SendMessage(pEvent->hWnd,WM_UPDATE,0,0);
+			//以下均为实验过的方法，均失败
 // 			((CMainFrame*)pEvent->hWnd)->TransferCommData();
 //			CView*	pView = (CView*)((CMainFrame*)pEvent->pMainframe)->m_wndSplit.GetPane(0,1);
 /*			POSITION	pos;
@@ -868,9 +898,11 @@ UINT	ThraedComm(LPVOID lpParam)
 }
 int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 {
+	((CMainFrame*)pEvent->pMainframe)->RecoveredInfoLen();
 	AfxMessageBox("准备写频");
 	//1、密码类型判断 SP_PC_KEY_CNF
 	int len = sizeof(SpPckeyReq_S);
+	int validNum;
 	int	nRcvChar;
 	szBuff[0] = szBuff[1] = 0x5f;
 	szBuff[2] = 0x0e;szBuff[3] = 0x00;
@@ -900,7 +932,7 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 	}
 	else
 	{
-		pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
+		pEvent->pSerial->WriteCommData(pEvent->szPara,22,10);
 		return 0;
 	}
 	if(pEvent->bCancel)
@@ -925,7 +957,7 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 	memcpy(szBuff+126,pEvent->pMenuSetting,25);
 	memcpy(szBuff+151,pEvent->pKeyFunctionSetting,11);
 
-	pEvent->pSerial->WriteCommData(szBuff,166,500);
+	pEvent->pSerial->WriteCommData(szBuff,166,100);
 	
 	// SP_PC_WRITE_CNF 写入确认		////////////
 	if (len !=sizeof(SpPcWriteCnf_S)+6)
@@ -998,7 +1030,10 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 	szBuff[1942] = 0x55;szBuff[1943] = 0xaa;
 	memcpy(szBuff+4,WriteScanReq,sizeof(SpPcWriteScan_S));
 	memcpy(szBuff+14,szPwd,4);
-	szBuff[18] = 0x20;szBuff[19] = 0x00;
+
+	szBuff[18] = 0x20;
+	szBuff[19] = 0x00;
+ 
 	memcpy(szBuff+20,pEvent->pScanInfo+0x02,1920);
 	pEvent->pSerial->WriteCommData(szBuff,1944,100);
 
@@ -1008,7 +1043,7 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 		len = sizeof(SpPcWriteCnf_S)+6;
 	}
 	nRcvChar = pEvent->pSerial->ReadCommData(szBuff,len,100);
-	if (nRcvChar!=22 ||(szBuff[14]!=0x19)||(szBuff[16]!=0x01))
+	if (nRcvChar!=22 ||(szBuff[14]!=0x13)||(szBuff[16]!=0x01))
 	{
 		pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
 		return 0;
@@ -1022,9 +1057,11 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 	szBuff[4422] = 0x55;szBuff[4423] = 0xaa;
 	memcpy(szBuff+4,WriteContactReq,sizeof(SpPcWriteContct_S));
 	memcpy(szBuff+14,szPwd,4);
-	szBuff[18] = 0xc8;szBuff[19] = 0x00;
+
+	szBuff[18] = 0xc8;
+	szBuff[19] = 0x00;
 	memcpy(szBuff+20,pEvent->pContactInfo+0x02,4400);
-	pEvent->pSerial->WriteCommData(szBuff,4424,100);
+	pEvent->pSerial->WriteCommData(szBuff,4424,500);
 
 	// SP_PC_WRITE_CNF 写入确认		////////////
 	if (len !=sizeof(SpPcWriteCnf_S)+6)
@@ -1032,7 +1069,7 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 		len = sizeof(SpPcWriteCnf_S)+6;
 	}
 	nRcvChar = pEvent->pSerial->ReadCommData(szBuff,len,100);
-	if (nRcvChar!=22 ||(szBuff[14]!=0x20)||(szBuff[16]!=0x01))
+	if (nRcvChar!=22 ||(szBuff[14]!=0x14)||(szBuff[16]!=0x01))
 	{
 		pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
 		return 0;
@@ -1043,13 +1080,13 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 	//8、组呼列表
 
 	szBuff[0] = szBuff[1] = 0x5f;
-	szBuff[2] = 0x58;szBuff[3] = 0x04;
+	szBuff[2] = 0x52;szBuff[3] = 0x04;
 	szBuff[1110] = 0x55;szBuff[1111] = 0xaa;
 	memcpy(szBuff+4,WriteGroupReq,sizeof(SpPcWriteGrp_S));
 	memcpy(szBuff+14,szPwd,4);
 	szBuff[18] = 0x20;szBuff[19] = 0x00;
 	memcpy(szBuff+20,pEvent->pGroupList+0x02,1088);
-	pEvent->pSerial->WriteCommData(szBuff,1112,100);
+	pEvent->pSerial->WriteCommData(szBuff,1112,500);
 
 	// SP_PC_WRITE_CNF 写入确认		////////////
 	if (len !=sizeof(SpPcWriteCnf_S)+6)
@@ -1057,7 +1094,7 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 		len = sizeof(SpPcWriteCnf_S)+6;
 	}
 	nRcvChar = pEvent->pSerial->ReadCommData(szBuff,len,100);
-	if (nRcvChar!=22 ||(szBuff[14]!=0x21)||(szBuff[16]!=0x01))
+	if (nRcvChar!=22 ||(szBuff[14]!=0x15)||(szBuff[16]!=0x01))
 	{
 		pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
 		return 0;
@@ -1071,9 +1108,10 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 	szBuff[8122] = 0x55;szBuff[8123] = 0xaa;
 	memcpy(szBuff+4,WriteTextReq,sizeof(SpPcWriteTxt_S));
 	memcpy(szBuff+14,szPwd,4);
-	szBuff[18] = 0x32;szBuff[19] = 0x00;
+	szBuff[18] = 0x32;
+	szBuff[19] = 0x00;
 	memcpy(szBuff+20,pEvent->pShortText+0x02,8100);
-	pEvent->pSerial->WriteCommData(szBuff,8124,100);
+	pEvent->pSerial->WriteCommData(szBuff,8124,1000);
 
 	// SP_PC_WRITE_CNF 写入确认		////////////
 	if (len !=sizeof(SpPcWriteCnf_S)+6)
@@ -1081,7 +1119,7 @@ int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 		len = sizeof(SpPcWriteCnf_S)+6;
 	}
 	nRcvChar = pEvent->pSerial->ReadCommData(szBuff,len,100);
-	if (nRcvChar!=22 ||(szBuff[14]!=0x22)||(szBuff[16]!=0x01))
+	if (nRcvChar!=22 ||(szBuff[14]!=0x16)||(szBuff[16]!=0x01))
 	{
 		pEvent->pSerial->WriteCommData(pEvent->szPara,22,1);
 		return 0;
@@ -1128,7 +1166,55 @@ CPCSWDoc*	CMainFrame::GetDocument()
 	return((CPCSWDoc*)(((CDocTemplate*)((CPCSWApp*)AfxGetApp())->m_template[0])->GetNextDoc(pos)));
 }
  
+void	CMainFrame::RecoveredInfoLen()
+{
 
+	iCommEvent.pRadioInfo = theApp.m_CommInfo.pRadioInfo;
+	//GetDocument()->pRadioInfo;
+	iCommEvent.pRadioSetting =theApp.m_CommInfo.pRadioSetting;
+	//GetDocument()->pRadioSetting;
+	iCommEvent.pMenuSetting =theApp.m_CommInfo.pMenuSetting;
+	// GetDocument()->pMenuSetting;
+	iCommEvent.pEmergencySetting = theApp.m_CommInfo.pEmergencySetting;
+	//GetDocument()->pEmerSetting;
+	iCommEvent.pKeyFunctionSetting = theApp.m_CommInfo.pKeyFunctionSetting;
+	//GetDocument()->pKeySetting;
+
+
+	iCommEvent.pZoneInfo = theApp.m_CommInfo.pZoneInfo;
+	//GetDocument()->pZoneInfo;
+	iCommEvent.pChannelInfo =theApp.m_CommInfo.pChannelInfo;
+	//GetDocument()->pChannelInfo;
+	iCommEvent.pScanInfo = theApp.m_CommInfo.pScanInfo;
+	//GetDocument()->pScanInfo;
+	iCommEvent.pContactInfo = theApp.m_CommInfo.pContactInfo;
+	//GetDocument()->pContact;
+	iCommEvent.pGroupList = theApp.m_CommInfo.pGroupList;
+	//GetDocument()->pGrouplist;
+	iCommEvent.pShortText = theApp.m_CommInfo.pShortText;
+
+	WORD nlen;
+	nlen = *(WORD*)iCommEvent.pScanInfo;
+// 	nlen = nlen/SCAN_STRUCT_LEN;
+	iCommEvent.pScanInfo[0x00] = (nlen&0x00ff);
+	iCommEvent.pScanInfo[0x01] = (nlen&0xff00)>>8;
+
+	nlen = *(WORD*)iCommEvent.pContactInfo;
+	nlen = nlen/CONTACT_STRUCT_LEN;
+	iCommEvent.pContactInfo[0x00] = (nlen&0x00ff);
+	iCommEvent.pContactInfo[0x01] = (nlen&0xff00)>>8;
+
+	nlen = *(WORD*)iCommEvent.pGroupList;
+	nlen = nlen/GRP_LIST_STRUCT_LEN;
+	iCommEvent.pGroupList[0x00] = (nlen&0x00ff);
+	iCommEvent.pGroupList[0x01] = (nlen&0xff00)>>8;
+
+	nlen = *(WORD*)iCommEvent.pShortText;
+	nlen = nlen/SHORTTEXT_STRUCT_LEN;
+	iCommEvent.pShortText[0x00] = (nlen&0x00ff);
+	iCommEvent.pShortText[0x01] = (nlen&0xff00)>>8;
+
+}
  void CMainFrame::OnWriteParameter() 
 {
 	// TODO: Add your command handler code here
@@ -1151,30 +1237,9 @@ CPCSWDoc*	CMainFrame::GetDocument()
 	}
 	iCommEvent.bRead = FALSE;		//要么读取，要么写入
 	iCommEvent.pSerial = &m_SerialPort;
-
-	iCommEvent.pRadioInfo = theApp.m_CommInfo.pRadioInfo;
-		//GetDocument()->pRadioInfo;
-	iCommEvent.pRadioSetting =theApp.m_CommInfo.pRadioSetting;
-		//GetDocument()->pRadioSetting;
-	iCommEvent.pMenuSetting =theApp.m_CommInfo.pMenuSetting;
-	// GetDocument()->pMenuSetting;
-	iCommEvent.pEmergencySetting = theApp.m_CommInfo.pEmergencySetting;
-	//GetDocument()->pEmerSetting;
-	iCommEvent.pKeyFunctionSetting = theApp.m_CommInfo.pKeyFunctionSetting;
-	//GetDocument()->pKeySetting;
+// 	RecoveredInfoLen();
 
 
-	iCommEvent.pZoneInfo = theApp.m_CommInfo.pZoneInfo;
-	//GetDocument()->pZoneInfo;
-	iCommEvent.pChannelInfo =theApp.m_CommInfo.pChannelInfo;
-	//GetDocument()->pChannelInfo;
-	iCommEvent.pScanInfo = theApp.m_CommInfo.pScanInfo;
-	//GetDocument()->pScanInfo;
-	iCommEvent.pContactInfo = theApp.m_CommInfo.pContactInfo;
-	//GetDocument()->pContact;
-	iCommEvent.pGroupList = theApp.m_CommInfo.pGroupList;
-	//GetDocument()->pGrouplist;
-	iCommEvent.pShortText = theApp.m_CommInfo.pShortText;
 	//GetDocument()->pShortText;
 
 	ZeroMemory(iCommEvent.bChannelExist,16);//防止有信道没有被设置
@@ -1186,6 +1251,7 @@ CPCSWDoc*	CMainFrame::GetDocument()
 	memcpy(iCommEvent.szPara+4,effectreq,sizeof(SpPcEffect_S));
 
 	m_pThread = AfxBeginThread(ThraedComm,&iCommEvent);	
+	m_bBusy = true;
 }
 
 void CMainFrame::OnUpdateWriteParameter(CCmdUI* pCmdUI) 
@@ -1240,36 +1306,6 @@ LRESULT 	CMainFrame::ShowChildWindow(WPARAM wParam,LPARAM lParam)
  				pView->LoadData();
 			}
 			break;
-/*
-		case 3:
-			{
- 				CRadioSetView* pView = new CRadioSetView;
-				pView=(CRadioSetView*)(((CFrameWnd*)(((CPCSWApp*)AfxGetApp())->m_Frame.GetAt(i-1)))->GetActiveView());
- 				pView->LoadData();
-			}
-			break;
-		case 4:
-			{
- 				CZoneInfo* pView = new CZoneInfo;
-				pView=(CZoneInfo*)(((CFrameWnd*)(((CPCSWApp*)AfxGetApp())->m_Frame.GetAt(i-1)))->GetActiveView());
- 				pView->LoadData();
-			}
-			break;
-		case 5:
-			{
- 				CScanView* pView = new CScanView;
-				pView=(CScanView*)(((CFrameWnd*)(((CPCSWApp*)AfxGetApp())->m_Frame.GetAt(i-1)))->GetActiveView());
- 				pView->LoadData();
-			}
-			break;
-		case 6:
-			{
- 				CDpmrView* pView = new CDpmrView;
-				pView=(CDpmrView*)(((CFrameWnd*)(((CPCSWApp*)AfxGetApp())->m_Frame.GetAt(i-1)))->GetActiveView());
- 				pView->LoadData();
-			}
-			break;*/
-
 		default:
 			break;
 		}
@@ -1326,10 +1362,10 @@ void	CMainFrame::SwitchView(int nIndex)
 		{
 			if (!pView->IsKindOf(RUNTIME_CLASS(CPCSWView)))
 			{
+				m_nViewIndex = 1;
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CPCSWView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-				m_nViewIndex = 1;
 			}
 		}
 		break;
@@ -1337,10 +1373,10 @@ void	CMainFrame::SwitchView(int nIndex)
 		{
  			if (!pView->IsKindOf(RUNTIME_CLASS(CMenuKeyView)))
 			{
+				m_nViewIndex = 2;
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CMenuKeyView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-				m_nViewIndex = 2;
 			}
 		}
 		break;
@@ -1348,10 +1384,10 @@ void	CMainFrame::SwitchView(int nIndex)
 		{
  			if (!pView->IsKindOf(RUNTIME_CLASS(CRadioSetView)))
 			{
+				m_nViewIndex = 3;
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CRadioSetView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-				m_nViewIndex = 3;
 			}
 		}
 		break;
@@ -1359,10 +1395,10 @@ void	CMainFrame::SwitchView(int nIndex)
 		{
  			if (!pView->IsKindOf(RUNTIME_CLASS(CScanView)))
 			{
+				m_nViewIndex = 4;
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CScanView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-				m_nViewIndex = 4;
 			}
 		}
 		break;
@@ -1370,10 +1406,10 @@ void	CMainFrame::SwitchView(int nIndex)
 		{
  			if (!pView->IsKindOf(RUNTIME_CLASS(CZoneInfo)))
 			{
+				m_nViewIndex = 5;
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CZoneInfo),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-				m_nViewIndex = 5;
 			}
 		}
 		break;
@@ -1381,14 +1417,25 @@ void	CMainFrame::SwitchView(int nIndex)
 		{
 			if (!pView->IsKindOf(RUNTIME_CLASS(CDpmrView)))
 			{
+				m_nViewIndex = 6;
 				m_wndSplit.DeleteView(0,1);
 				m_wndSplit.CreateView(0,1,RUNTIME_CLASS(CDpmrView),CSize(rectView.Width(),rectView.Height()),NULL);
 				m_wndSplit.RecalcLayout();
-				m_nViewIndex = 6;
 			}
 		}
 		break;
 	default:
 		break;
 	}
+}
+
+BOOL CMainFrame::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message) 
+{
+	// TODO: Add your message handler code here and/or call default
+	if (m_bBusy)
+	{
+		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT)); 
+		return TRUE;
+	}
+  	return CMDIFrameWnd::OnSetCursor(pWnd, nHitTest, message);
 }
