@@ -268,8 +268,7 @@ void	CMainFrame::TransferCommData()
 }
 LRESULT	CMainFrame::OnUpdateViews(WPARAM wparam,LPARAM lparam)
 {
-	((CPCSWApp*)AfxGetApp())->UpdateActiveView();
-	CView*	pView = (CView*)m_wndSplit.GetPane(0,1);
+ 	CView*	pView = (CView*)m_wndSplit.GetPane(0,1);
 	CRect	rectView,rectFrm;
 	pView->GetClientRect(&rectView);
 	GetClientRect(&rectFrm);
@@ -554,7 +553,9 @@ void CMainFrame::OnReadParameter()
 	memcpy(iCommEvent.szPara+4,effectreq,sizeof(SpPcEffect_S));
 
 	m_pThread = AfxBeginThread(ThraedComm,&iCommEvent);
+	AfxMessageBox("准备读频");
 	m_bBusy = true;
+// 	SetHook(m_hWnd);
 
 }
 UINT	ThraedComm(LPVOID lpParam)
@@ -579,7 +580,7 @@ UINT	ThraedComm(LPVOID lpParam)
 		{
 			for (int k=0;k<3;k++)
 			{
-// 				while(pEvent->pSerial->ReadCommData(0)!=-1);
+				while(pEvent->pSerial->ReadCommData(1)!=0);
 				//打开串口之后，一直等待串口数据传出来，有数据之后，才继续往下运行
 				// 			while(pEvent->pSerial->ReadCommData(0)>=0);
 
@@ -590,7 +591,8 @@ UINT	ThraedComm(LPVOID lpParam)
 				szBuff[2] = 0x10;szBuff[3] = 0x00;
 				szBuff[20] = 0x55; szBuff[21] = 0xaa;
 				memcpy(szBuff+4,connectreq,sizeof(SpPcConnect_S));
-				int returnNum = pEvent->pSerial->WriteCommData(szBuff,22,10,0);
+				int returnNum ;
+				returnNum = pEvent->pSerial->WriteCommData(szBuff,22,10,1);
 				
 				//接收下位机数据，应该为建立连接响应SpConnectCnF
 				//当结构变化后，灵活转换
@@ -621,7 +623,6 @@ UINT	ThraedComm(LPVOID lpParam)
 	}//end for i==300	
 		if (pEvent->bRead)
 		{//读频处理
- 			AfxMessageBox("准备读频");
 			//密码请求
 			// 5F 5F 0E 00 00 03 00 2B 02 00 91 11 02 00 00 00 FF FF 55 AA 
 			szBuff[0] = szBuff[1] = 0x5f;
@@ -876,10 +877,9 @@ UINT	ThraedComm(LPVOID lpParam)
 		{
 			return 0;
 		}
-		SendMessage(pEvent->hWnd,WM_SETCURSOR,(WPARAM)0,0);
-		AfxMessageBox("操作完成");
-
 		((CMainFrame*)pEvent->pMainframe)->TransferCommData();
+		SendMessage(pEvent->hWnd,WM_SETCURSOR,(WPARAM)0,0);
+
 	if (pEvent->bRead)
 	{
 // 			((CMainFrame*)pEvent->pMainframe)->UpdateAllViews(1);
@@ -893,13 +893,13 @@ UINT	ThraedComm(LPVOID lpParam)
 			pDoc = (CPCSWDoc*)((CDocTemplate*)((CPCSWApp*)AfxGetApp())->m_template[0])->GetNextDoc(pos);
 			pDoc->UpdateAllViews(NULL);
 */	}
+	AfxMessageBox("操作完成");
 	pEvent->pSerial->CloseComm();
  	return 1;
 }
 int	WriteParameter(byte* szBuff,COMM_EVENT* pEvent)
 {
 	((CMainFrame*)pEvent->pMainframe)->RecoveredInfoLen();
-	AfxMessageBox("准备写频");
 	//1、密码类型判断 SP_PC_KEY_CNF
 	int len = sizeof(SpPckeyReq_S);
 	int validNum;
@@ -1250,8 +1250,10 @@ void	CMainFrame::RecoveredInfoLen()
 	iCommEvent.szPara[20] = 0x55;iCommEvent.szPara[21]= 0xaa;
 	memcpy(iCommEvent.szPara+4,effectreq,sizeof(SpPcEffect_S));
 
+	AfxMessageBox("准备写频");
 	m_pThread = AfxBeginThread(ThraedComm,&iCommEvent);	
 	m_bBusy = true;
+// 	SetHook(m_hWnd);
 }
 
 void CMainFrame::OnUpdateWriteParameter(CCmdUI* pCmdUI) 
@@ -1434,8 +1436,34 @@ BOOL CMainFrame::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	// TODO: Add your message handler code here and/or call default
 	if (m_bBusy)
 	{
-		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT)); 
-		return TRUE;
+// 		if(IsCursorIn())
+		{
+			SetHook(m_hWnd);
+			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT)); 
+			return TRUE;
+		}
+// 		else
+// 		{
+// 			StopHook(); 
+// 			return CMDIFrameWnd::OnSetCursor(pWnd, nHitTest, message);
+// 		}
 	}
-  	return CMDIFrameWnd::OnSetCursor(pWnd, nHitTest, message);
+	else
+	{
+		StopHook(); 
+	}
+	return CMDIFrameWnd::OnSetCursor(pWnd, nHitTest, message);
+}
+bool	CMainFrame::IsCursorIn()
+{
+	CRect	rect;
+	GetWindowRect(rect);
+	CPoint	pt;
+	GetCursorPos(&pt);
+	if (PtInRect(rect,pt))
+	{
+		return true;
+	}
+	else
+		return false;
 }

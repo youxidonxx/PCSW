@@ -50,10 +50,11 @@ void CMenuKeyView::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CMenuKeyView)
-// 	DDX_Control(pDX, IDC_COMBO_KEYFUNC, m_GridComboZone);
+	// 	DDX_Control(pDX, IDC_COMBO_KEYFUNC, m_GridComboZone);
 	DDX_Control(pDX, IDC_LIST_MENU, m_listMenu);
 	//}}AFX_DATA_MAP
-// 	DDX_GridControl(pDX,IDC_CUSTOM2,m_GridCtrl);
+	// 	DDX_GridControl(pDX,IDC_CUSTOM2,m_GridCtrl);
+	DDX_Control(pDX, IDC_CHECK_ALL, m_CheckAll);
 }
 
 
@@ -65,6 +66,7 @@ BEGIN_MESSAGE_MAP(CMenuKeyView, CFormView)
 // 	ON_MESSAGE(WM_ON_CHKBOX,OnCheckBox)
 	ON_NOTIFY(NM_CLICK,IDC_LIST_MENU,OnCheckBox)
 	ON_CONTROL_RANGE(CBN_SELCHANGE,IDC_COMBO_KEYFUNC_1,IDC_COMBO_KEYFUNC_11,OnSelchangeComboKeyfunc)
+	ON_BN_CLICKED(IDC_CHECK_ALL, &CMenuKeyView::OnBnClickedCheckAll)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -168,11 +170,29 @@ void	CMenuKeyView::LoadData()
 				nVal = 0;
 			m_listMenu.SetCheck(i,nVal);
 		}
-		nVal = GetKillUnkill(MenuAllowKill);
+		nVal = GetKillUnkill(SETTING_ACTIVE_EN);
 		m_listMenu.SetCheck(i++,nVal);
-		nVal = GetKillUnkill(MenuAllowActive);
+		nVal = GetKillUnkill(SETTING_KILL_EN);
 		m_listMenu.SetCheck(i++,nVal);
 	}
+	if(bAllCheck())
+		((CButton*)GetDlgItem(IDC_CHECK_ALL))->SetCheck(TRUE);
+	else
+		((CButton*)GetDlgItem(IDC_CHECK_ALL))->SetCheck(FALSE);
+}
+BOOL	CMenuKeyView::bAllCheck()
+{
+	int i;
+	for (i=0;i<m_listMenu.GetItemCount();i++)
+	{
+		if(m_listMenu.GetCheck(i)!=TRUE)
+		{
+			return FALSE;
+			break;
+		}
+	}
+	return TRUE;
+
 }
 int		CMenuKeyView::GetCheckValues(int nFlag )
 {
@@ -188,10 +208,10 @@ void	CMenuKeyView::SetMenuKillUnkill(int nVal,bool bKill /*= TRUE*/)
 {
 	if(bKill)
 	{
-		((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioSetting[0x00+MenuAllowKill] = nVal;
+		((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioSetting[0x00+SETTING_KILL_EN] = nVal;
 	}
 	else
-		((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioSetting[0x00+MenuAllowActive] = nVal;
+		((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioSetting[0x00+SETTING_ACTIVE_EN] = nVal;
 }
 int		CMenuKeyView::GetKeyFuncValues(int nFlag)
 {
@@ -217,7 +237,7 @@ void	CMenuKeyView::SetMenuVal(int nFlag,int nVal)
 void	CMenuKeyView::OnSelchangeComboKeyfunc(UINT	nID) 
 {
 	// TODO: Add your control notification handler code here
-	int nIndex = nID<IDC_COMBO_KEYFUNC_11?(nID - IDC_COMBO_KEYFUNC_1):-1;
+	int nIndex = nID<=IDC_COMBO_KEYFUNC_11?(nID - IDC_COMBO_KEYFUNC_1):-1;
 	if (nIndex<0)
 	{
 		return;
@@ -273,4 +293,35 @@ void	CMenuKeyView::OnCheckBox(NMHDR * pNMHDR, LRESULT* pResult)
 // 		int nState = m_listMenu.GetCheck(item);
 // 	}
 
+}
+void CMenuKeyView::OnBnClickedCheckAll()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int nCheck = ((CButton*)GetDlgItem(IDC_CHECK_ALL))->GetCheck();
+	((CButton*)GetDlgItem(IDC_CHECK_ALL))->SetCheck(nCheck);
+	int i=0;
+	int nCnt = m_listMenu.GetItemCount();
+	for (i=0;i<nCnt;i++)
+	{
+		m_listMenu.SetCheck(i,nCheck);
+		if(  i<nCnt-2)
+		{
+// 			nState = m_listMenu.GetCheck(nRow);
+// 			nState = !nState;
+			SetMenuVal(i,nCheck);
+
+		}
+		else if (i == nCnt-2)//激活
+		{
+// 			nState = m_listMenu.GetCheck(nRow);
+// 			nState = !nState;
+			SetMenuKillUnkill(nCheck,FALSE);
+		}
+		else if (i == nCnt-1)//遥毙
+		{
+// 			nState = m_listMenu.GetCheck(nRow);
+// 			nState = !nState;
+			SetMenuKillUnkill(nCheck);
+		}	
+	}
 }

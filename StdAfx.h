@@ -24,6 +24,8 @@
 #define		CHANNEL_STRUCT_LEN		46
 #define		SCAN_STRUCT_LEN			60
 
+
+
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 #include <afxdisp.h>        // MFC Automation classes
@@ -32,12 +34,14 @@
 #include <afxcmn.h>			// MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
 #include <afxcview.h>
-#include <afxdisp.h>
-
+ 
 #include <iostream> 
 using namespace std;
 #include <map>//STL头文件，不用添加.h  用于map容器使用
 #include <algorithm>//
+
+// #pragma comment(linker,"../Debug/hook.lib")
+
 //基本信息部分
 enum	RadioInfoAddr
 {

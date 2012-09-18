@@ -112,8 +112,8 @@ public:
 
 // Implementation
 public:
+	bool	IsCursorIn();
 	void	SwitchView(int nIndex);
-	virtual ~CMainFrame();
 	void	UpdateAllViews(int nFlag);
 	void	UpdateViewData();
 #ifdef _DEBUG
@@ -122,6 +122,7 @@ public:
 #endif
 	CSplitterWnd	m_wndSplit;
 	void	RecoveredInfoLen();
+	virtual ~CMainFrame();
 
 protected:  // control bar embedded members
 	CStatusBar  m_wndStatusBar;

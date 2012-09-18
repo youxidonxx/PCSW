@@ -63,6 +63,7 @@ BOOL CPropPageSMS::OnInitDialog()
 	m_gridCtrl.SetRowCount(m_nGridCnt+1);
 	m_gridCtrl.SetColumnCount(2);//只有2列
  	m_gridCtrl.SetFixedRowCount();
+	m_gridCtrl.SetFixedColumnCount();
 
 	
 	LoadData();
@@ -167,11 +168,11 @@ void CPropPageSMS::OnGridEdit(NMHDR* pNMHDR, LRESULT* pResult)
 		m_gridCtrl.SetEditState(TRUE);
 	switch(pInfo->item.col)
 	{
-	case 0://序号
-		{
-			m_gridEdit.Initialize(CGridEdit::Name,2,pInfo->item.szText,&rect);
-		}
-		break;
+// 	case 0://序号
+// 		{
+// 			m_gridEdit.Initialize(CGridEdit::Name,2,pInfo->item.szText,&rect);
+// 		}
+// 		break;
 	case 1://内容
 		{
 			m_gridEdit.Initialize(CGridEdit::Name,160,pInfo->item.szText,&rect);
@@ -225,11 +226,12 @@ void CPropPageSMS::OnBnClickedButtonDel()
 		int	nSmsnum,nTxlen;
 		while (nRow<m_nGridCnt)
 		{//从后面往前搬移
+// 			nSmsnum = ((CPCSWApp*)AfxGetApp())->GetSmsInfo(nRow+1,SMS_TXTNUM);
+// 			nSmsnum--;
+			nSmsnum = nRow;
 			memcpy(&((CPCSWApp*)AfxGetApp())->m_CommInfo.pShortText[0x00+2+(nRow-1)*SHORTTEXT_STRUCT_LEN],
 				&((CPCSWApp*)AfxGetApp())->m_CommInfo.pShortText[0x00+2+nRow*SHORTTEXT_STRUCT_LEN],SHORTTEXT_STRUCT_LEN);
 			//序号还得改变
-			nSmsnum = ((CPCSWApp*)AfxGetApp())->GetSmsInfo(nRow,SMS_TXTNUM);
-			nSmsnum--;
 			((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTNUM,nRow,nSmsnum);
 			nTxlen = ((CPCSWApp*)AfxGetApp())->GetSmsInfo(nRow,SMS_TXTLEN);
 			((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTLEN,nRow,nTxlen);
@@ -240,9 +242,7 @@ void CPropPageSMS::OnBnClickedButtonDel()
 		m_nGridCnt--;
 		((CPCSWApp*)AfxGetApp())->SetSmsCount(m_nGridCnt*SHORTTEXT_STRUCT_LEN);//总数写入
 
-// 		((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTNUM,m_nGridCnt,m_nGridCnt);
-// 		((CPCSWApp*)AfxGetApp())->SetSmsInfo(SMS_TXTLEN,m_nGridCnt,0);
-	}
+ 	}
 	LoadData();
 }
 

@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="PCSW"
 	ProjectGUID="{E2F1047E-C2EA-4A35-B181-4160BD48E03B}"
+	RootNamespace="PCSW"
 	Keyword="MFCProj"
 	>
 	<Platforms>
@@ -175,6 +176,7 @@
 				OutputFile=".\Debug/PCSW.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/PCSW.pdb"
 				SubSystem="2"
@@ -951,6 +953,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\icon1.ico"
+				>
+			</File>
+			<File
 				RelativePath="res\PCSW.ico"
 				>
 			</File>
@@ -972,10 +978,22 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Hook.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Release\Hook.lib"
+			>
+		</File>
+		<File
 			RelativePath="ReadMe.txt"
 			>
 		</File>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="PCSW.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

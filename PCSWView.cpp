@@ -15,7 +15,13 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 extern	CPCSWApp	theApp;
+#ifdef _CHANGED
+static	CString		strFreqScole[] = {"136M-174M","400M-470M","400M-425M"};
+#else
 static	CString	strFreqScole[] = {"136M-150M","150M-174M","400M-470M","400M-425M"};
+#endif
+
+#define FreqScopeNum	ARRAYSIZE(strFreqScole)
 /////////////////////////////////////////////////////////////////////////////
 // CPCSWView
 
@@ -197,13 +203,6 @@ void	CPCSWView::LoadData()
 #endif
 
 }
-// void CPCSWView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint) 
-// {
-// 	// TODO: Add your specialized code here and/or call the base class
-// 	
-// //	LoadData();
-//  	return;
-// }
 int CPCSWView::GetFreqScope()
 {
 	int	nRet = ((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioInfo[Freqscope]+((CPCSWApp*)AfxGetApp())->m_CommInfo.pRadioInfo[Freqscope+1]*256;
@@ -232,20 +231,7 @@ CString	CPCSWView::GetAllVersion(int nFlag,int nLen)
 }
 void CPCSWView::OnDestroy() 
 {
-//	CFormView::OnDestroy();
-/*	this->ShowWindow(SW_HIDE);
-	if(((CPCSWApp*)AfxGetApp())->m_Frame.GetAt(0)!=NULL)
-		((CPCSWApp*)AfxGetApp())->m_Frame.SetAt(0,NULL);
-	CDocTemplate*	pTmp ;
-	pTmp = (CDocTemplate*)((CPCSWApp*)AfxGetApp())->m_template[0];
-		POSITION	pos;
-	pos = pTmp->GetFirstDocPosition();
-	if (pos == NULL)
-	{
-		pTmp->AddDocument(GetDocument());
-	}
-	// TODO: Add your message handler code here
-*/	
+
 }
 
 void CPCSWView::OnSelchangeComboFreqRange() 
@@ -277,8 +263,3 @@ void CPCSWView::OnClose()
  	CFormView::OnClose();
 }
 
-//void CPCSWView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/)
-//{
-//	// TODO: 在此添加专用代码和/或调用基类
-//	LoadData();
-//}

@@ -14,7 +14,16 @@
 
 #include "resource.h"       // main symbols
 
+#ifdef DLL_IMPORT
+extern	void SetHook(HWND hwnd);
+extern	void StopHook();
+#else
+_declspec(dllimport) void SetHook(HWND hwnd);
+_declspec(dllimport) void StopHook();
 
+#endif
+
+#define _CHANGED
 /************************************************************************/
 /* 宏功能: 界面刷新时仅刷新指定控件以外的空白区域;可有效避免窗口闪烁
 /* 使用于: WM_ERASEBKGND 消息处理函数 OnEraseBkgnd(); 

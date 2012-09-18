@@ -17,6 +17,7 @@
 #include "ReportCtrl.h"
 #include "AddBox.h"
 #include "GridCtrl.h"
+#include "afxwin.h"
 
 class CMenuKeyView : public CFormView
 {
@@ -43,6 +44,7 @@ public:
 	void	SetKeyFunc(int nFlag,int nVal);
 	void	SetMenuVal(int nFlag,int nVal);
 	void	SetMenuKillUnkill(int nVal,bool	bKill = true);
+	BOOL	bAllCheck();
 	int		GetCheckValues(int nFlag);
 	int		GetKillUnkill(int nFlag);
 	int		GetKeyFuncValues(int nFlag);
@@ -80,6 +82,10 @@ protected:
 		afx_msg void OnEditGrid(GV_DISPINFO* pInfo, LRESULT* pResult);
 		afx_msg		void	OnCheckBox(NMHDR * pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
+public:
+	CButton m_CheckAll;
+public:
+	afx_msg void OnBnClickedCheckAll();
 };
 
 /////////////////////////////////////////////////////////////////////////////

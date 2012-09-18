@@ -17,9 +17,19 @@
 #include "GridView.h"
 
 #ifdef _DEBUG
+#pragma comment(lib,"Hook.lib")
+#include "Hook.h"
+#endif
+
+#ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
+#endif
+#ifdef DLL_IMPORT
+HHOOK g_hMouse = NULL;
+HHOOK g_hKeyboard = NULL;
+HWND g_hWnd = NULL;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -31,6 +41,7 @@ DWORD	dwPreLength,dwActualLength;
 #endif // _CONSOLE
 #endif // _DEBUG
 
+extern	 	CString		strFreqScole;
 
 BEGIN_MESSAGE_MAP(CPCSWApp, CWinApp)
 	//{{AFX_MSG_MAP(CPCSWApp)
@@ -44,9 +55,6 @@ ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
 ON_COMMAND(ID_FILE_SAVE,OnFileSave)
 END_MESSAGE_MAP()
 
-
-/////////////////////////////////////////////////////////////////////////////
-// CPCSWApp construction
 CString		AddStringTailZero(CString&	str,int nDesiredLen)
 {
 	if(str.IsEmpty())
@@ -176,6 +184,46 @@ void	AddStrTailZero(CString&	str,int nDesiredLen)
 	}
 	return;
 }
+
+#ifdef	DLL_IMPORT
+LRESULT CALLBACK MouseProc(int nCode,
+						   WPARAM wParam,
+						   LPARAM lParam
+						   )
+{
+	return 1;
+}
+LRESULT CALLBACK KeyboardProc(int code,
+							  WPARAM wParam,
+							  LPARAM lParam
+							  )
+{
+	if (VK_F2 == wParam)
+	{
+		SendMessage(g_hWnd,WM_CLOSE,0,0);
+		UnhookWindowsHookEx(g_hMouse);
+		UnhookWindowsHookEx(g_hKeyboard);
+	}
+	return 1;
+}
+void SetHook(HWND hwnd)
+{
+	g_hWnd = hwnd;
+	g_hMouse = SetWindowsHookEx(WH_MOUSE,MouseProc,GetModuleHandle("Hook"),0);
+	//	g_hKeyboard = SetWindowsHookEx(WH_KEYBOARD,KeyboardProc,GetModuleHandle("Hook"),0);
+}
+void	StopHook()
+{
+	if(g_hMouse != NULL)
+		UnhookWindowsHookEx(g_hMouse);
+	g_hMouse = NULL;
+	if(g_hKeyboard!=NULL)
+		UnhookWindowsHookEx(g_hKeyboard);
+	g_hKeyboard = NULL;
+}
+#endif
+/////////////////////////////////////////////////////////////////////////////
+// CPCSWApp construction
 CPCSWApp::CPCSWApp()
 {
 	// TODO: add construction code here,
@@ -198,12 +246,13 @@ BOOL CPCSWApp::InitInstance()
 	// If you are not using these features and wish to reduce the size
 	//  of your final executable, you should remove from the following
 	//  the specific initialization routines you do not need.
-
-// #ifdef _AFXDLL
-// 	Enable3dControls();			// Call this when using MFC in a shared DLL
-// #else
-// 	Enable3dControlsStatic();	// Call this when linking to MFC statically
-// #endif
+#if _MSC_VER<=1200
+#ifdef _AFXDLL
+	Enable3dControls();			// Call this when using MFC in a shared DLL
+#else
+	Enable3dControlsStatic();	// Call this when linking to MFC statically
+#endif
+#endif
 	INITCOMMONCONTROLSEX InitCtrls;  
 	InitCtrls.dwSize = sizeof(InitCtrls);  
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;  
@@ -226,13 +275,13 @@ BOOL CPCSWApp::InitInstance()
 
 	//这里当做单文档使用，多视图嵌入
 	int n=0;
-	CMultiDocTemplate* pDocTemplate;
-	pDocTemplate = new CMultiDocTemplate(
-		IDR_PCSWTYPE,
-		RUNTIME_CLASS(CPCSWDoc),
-		RUNTIME_CLASS(CChildFrame), // custom MDI child frame
-		RUNTIME_CLASS(CPCSWView));
-	AddDocTemplate(pDocTemplate);
+// 	CMultiDocTemplate* pDocTemplate;
+// 	pDocTemplate = new CMultiDocTemplate(
+// 		IDR_PCSWTYPE,
+// 		RUNTIME_CLASS(CPCSWDoc),
+// 		RUNTIME_CLASS(CChildFrame), // custom MDI child frame
+// 		RUNTIME_CLASS(CPCSWView));
+// 	AddDocTemplate(pDocTemplate);
 
 // 	m_template.Add(pDocTemplate);
  // 	m_Frame.Add(NULL);
@@ -286,7 +335,7 @@ BOOL CPCSWApp::InitInstance()
 // 	CDocTemplate*	pTmp = (CDocTemplate*)m_template.GetAt(0);
 	// create main MDI Frame window
 	CMainFrame* pMainFrame = new CMainFrame;
-	if (!pMainFrame->LoadFrame(IDR_PCSWTYPE))
+	if (!pMainFrame->LoadFrame(IDR_MAINFRAME))
 		return FALSE;
 	m_pMainWnd = pMainFrame;
 
@@ -407,7 +456,8 @@ void CPCSWApp::OnFileOpen()
     }
 	else
 		return;
- 	CFile	file;
+	SetHook(m_pMainWnd->m_hWnd);
+	CFile	file;
 	CFileException	ce;
  	if(!file.Open(newName,CFile::modeRead,&ce))
 	{
@@ -436,7 +486,8 @@ void CPCSWApp::OnFileOpen()
 			//(ID_APP_ABOUT);
 // 		pView->UpdateWindow();
 // 	file.Close();
-		UpdateActiveView();
+// 		UpdateActiveView();
+	StopHook();
 }
 void	CPCSWApp::UpdateActiveView()
 {
@@ -485,7 +536,7 @@ int	CPCSWApp::GetFreqScope()
 }
 void	CPCSWApp::SetFreqScope(int nRange)
 {
-	if (nRange>0 || nRange <=4)
+	if (nRange>0 || nRange <=ArraySize(strFreqScole))
 	{
 		m_CommInfo.pRadioInfo[0x00+Freqscope] = nRange%256;//16bits 0xff
 		m_CommInfo.pRadioInfo[0x00+Freqscope+1] = nRange/256;
@@ -500,7 +551,11 @@ int  CPCSWApp::GetFreqBoundry(bool bMax /* = true */)
 		switch (nType)
 		{
 		case 1:
-			nBoundry = 150;
+#ifdef _CHANGED
+	nBoundry =174;
+#else
+	nBoundry = 150;
+#endif			
 			break;
 		case 2:
 			nBoundry = 174;
@@ -775,7 +830,7 @@ int		CPCSWApp::GetSmsInfo(int nGrp,int nFlag)
 
 void	CPCSWApp::SetSmsContent(int nFlag,int nGrp,CString& str,int nLen)
 {
-	memset(&m_CommInfo.pShortText[0x00+2+nFlag+(nGrp-1)*SHORTTEXT_STRUCT_LEN],0x00,SHORTTEXT_STRUCT_LEN);
+	memset(&m_CommInfo.pShortText[0x00+2+nFlag+(nGrp-1)*SHORTTEXT_STRUCT_LEN],0x00,SHORTTEXT_STRUCT_LEN-2);
 	int nLength = str.GetLength();
 	if(!str.IsEmpty())
 		MultiByteToWideChar(CP_ACP,0,str,nLength,(LPWSTR)(&m_CommInfo.pShortText[0x00+2+nFlag+(nGrp-1)*SHORTTEXT_STRUCT_LEN]),160);

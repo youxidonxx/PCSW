@@ -23,6 +23,7 @@
 #define IDD_PROPPAGE_SMS                143
 #define IDD_MENUKEY_FORM                144
 #define IDD_GRID_VIEW                   145
+#define IDI_ICON1                       146
 #define IDC_COMBO_COMSET                1000
 #define IDC_EDIT_SERIALNUM              1001
 #define IDC_EDIT_MACHINE_TYPE           1002
@@ -202,6 +203,8 @@
 #define IDC_STATIC_GRP                  1101
 #define IDC_COMBO_KEYFUNC_10            1102
 #define IDC_COMBO_KEYFUNC_11            1103
+#define IDC_CHECK1                      1104
+#define IDC_CHECK_ALL                   1104
 #define ID_WRITE_PARAMETER              32771
 #define ID_READ_PARAMETER               32772
 #define ID_COPY_PARAMETER               32773
@@ -214,9 +217,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_RESOURCE_VALUE        147
 #define _APS_NEXT_COMMAND_VALUE         32777
-#define _APS_NEXT_CONTROL_VALUE         1103
+#define _APS_NEXT_CONTROL_VALUE         1105
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
